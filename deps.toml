@@ -4,5 +4,5 @@ name = "piot/imprint"
 version = "0.0.0"
 
 [[dependencies]]
-name = 'piot/tiny-libc'
+name = 'piot/clog'
 version = "*"
