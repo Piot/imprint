@@ -19,10 +19,9 @@ void imprintTaggedPageAllocatorDestroy(ImprintTaggedPageAllocator* self)
             entry->tag = 0;
         }
     }
-
-
 }
-void imprintTaggedPageAllocatorAlloc(ImprintTaggedPageAllocator* self, uint64_t tag, ImprintPageResult* result)
+
+void imprintTaggedPageAllocatorAlloc(ImprintTaggedPageAllocator* self, uint64_t tag, size_t pageCount, ImprintPageResult* result)
 {
     ImprintTaggedPageEntry* foundEntry = 0;
     if (!tag) {
@@ -53,7 +52,7 @@ void imprintTaggedPageAllocatorAlloc(ImprintTaggedPageAllocator* self, uint64_t 
         CLOG_ERROR("out of memory");
     }
 
-    imprintPageAllocatorAlloc(self->pageAllocator, 1, result);
+    imprintPageAllocatorAlloc(self->pageAllocator, pageCount, result);
 
     foundEntry->pageIds |= result->pageIds;
 }

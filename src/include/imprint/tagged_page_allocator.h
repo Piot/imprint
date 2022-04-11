@@ -19,7 +19,7 @@ typedef struct ImprintTaggedPageAllocator {
 
 void imprintTaggedPageAllocatorInit(ImprintTaggedPageAllocator* self, ImprintPageAllocator* pageAllocator);
 void imprintTaggedPageAllocatorDestroy(ImprintTaggedPageAllocator* self);
-void imprintTaggedPageAllocatorAlloc(ImprintTaggedPageAllocator* self, uint64_t tag, ImprintPageResult* result);
+void imprintTaggedPageAllocatorAlloc(ImprintTaggedPageAllocator* self, uint64_t tag, size_t pageCount, ImprintPageResult* result);
 void imprintTaggedPageAllocatorFree(ImprintTaggedPageAllocator* self, uint64_t tag);
 
 #endif
