@@ -1,11 +1,10 @@
 #include <clog/clog.h>
 #include <imprint/slab_allocator.h>
 
-//void* self_, size_t size, const char *sourceFile, int line,
-  //  const char *description
-static void *imprintSlabAllocatorAlloc(void *self_, size_t size, const char *sourceFile, size_t line,
+static void *imprintSlabAllocatorAlloc(void *self_, size_t size,
+                                       const char *sourceFile, size_t line,
                                        const char *description) {
-  ImprintSlabAllocator* self = (ImprintSlabAllocator*)self_;
+  ImprintSlabAllocator *self = (ImprintSlabAllocator *)self_;
   for (size_t i = 0; i < self->capacity; ++i) {
     ImprintSlabCache *cache = &self->caches[i];
     if (size <= cache->structSize) {
@@ -16,9 +15,10 @@ static void *imprintSlabAllocatorAlloc(void *self_, size_t size, const char *sou
   CLOG_ERROR("unsupported size");
 }
 
-static void imprintSlabAllocatorFree(void *self_, void *ptr, const char *sourceFile, size_t line,
-const char *description) {
-  ImprintSlabAllocator* self = (ImprintSlabAllocator*)self_;
+static void imprintSlabAllocatorFree(void *self_, void *ptr,
+                                     const char *sourceFile, size_t line,
+                                     const char *description) {
+  ImprintSlabAllocator *self = (ImprintSlabAllocator *)self_;
   for (size_t i = 0; i < self->capacity; ++i) {
     ImprintSlabCache *cache = &self->caches[i];
     bool worked = imprintSlabCacheTryToFree(cache, ptr);
@@ -31,9 +31,8 @@ const char *description) {
 }
 
 void imprintSlabAllocatorInit(ImprintSlabAllocator *self,
-                              ImprintAllocator *allocator,
-                              size_t powerOfTwo, size_t capacity,
-                              const char *debug) {
+                              ImprintAllocator *allocator, size_t powerOfTwo,
+                              size_t capacity, const char *debug) {
   if (capacity > 4) {
     CLOG_ERROR("not supported")
   }

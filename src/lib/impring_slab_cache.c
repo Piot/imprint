@@ -39,7 +39,8 @@ void imprintSlabCacheInit(ImprintSlabCache *self, ImprintAllocator *allocator,
 void *imprintSlabCacheAlloc(ImprintSlabCache *self, size_t size,
                             const char *file, size_t line, const char *debug) {
   CLOG_ASSERT(self->allocatedCount < self->capacity,
-              "Out of memory in self (%zu out of %zu) for size %zu. %s %s:%d", self->allocatedCount, self->capacity, self->structSize,
+              "Out of memory in self (%zu out of %zu) for size %zu. %s %s:%d",
+              self->allocatedCount, self->capacity, self->structSize,
               self->debug, file, line)
 
   if (self->firstFreeEntry == 0) {
@@ -67,7 +68,6 @@ void *imprintSlabCacheAlloc(ImprintSlabCache *self, size_t size,
   self->allocatedCount++;
   e->isAllocated = true;
 
-
   return m;
 }
 
@@ -80,14 +80,12 @@ static inline int indexFromAllocation(const ImprintSlabCache *cache,
   return ((const uint8_t *)p - cache->memory) / cache->structSize;
 }
 
-
 static inline int findIndexFromAllocation(const ImprintSlabCache *cache,
-                                      const void *p) {
+                                          const void *p) {
 
   if ((uintptr_t)p % cache->structAlign != 0) {
     return -1;
   }
-
 
   return ((uintptr_t)p - (uintptr_t)cache->memory) / cache->structSize;
 }
@@ -109,7 +107,7 @@ findEntryFromAllocation(const ImprintSlabCache *self, const void *p) {
     return 0;
   }
 
-  ImprintSlabCacheEntry* e =  &self->entries[index];
+  ImprintSlabCacheEntry *e = &self->entries[index];
   if (e->allocatedPointer != p) {
     CLOG_ERROR("allocated pointer differs")
   }
@@ -117,9 +115,9 @@ findEntryFromAllocation(const ImprintSlabCache *self, const void *p) {
 }
 
 static inline void freeEntry(ImprintSlabCache *self, ImprintSlabCacheEntry *e) {
-    if (!e->isAllocated) {
-      CLOG_ERROR("can not free this");
-    }
+  if (!e->isAllocated) {
+    CLOG_ERROR("can not free this");
+  }
   e->isAllocated = false;
   self->allocatedCount--;
 
@@ -134,7 +132,7 @@ bool imprintSlabCacheTryToFree(ImprintSlabCache *self, void *ptr) {
   }
 
   if (!foundEntry->isAllocated) {
-  CLOG_ERROR("multiple free")
+    CLOG_ERROR("multiple free")
     return false;
   }
   freeEntry(self, foundEntry);
