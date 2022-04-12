@@ -16,6 +16,7 @@ typedef struct ImprintPageAllocator {
     uint8_t* basePointerForPages;
     size_t pageCount;
     size_t pageSizeInOctets;
+    size_t allocatedPageCount;
 } ImprintPageAllocator;
 
 void imprintPageAllocatorInit(ImprintPageAllocator* self, size_t pageCount);

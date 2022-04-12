@@ -6,6 +6,7 @@
 
 void imprintPageAllocatorInit(ImprintPageAllocator *self, size_t pageCount) {
   self->pageCount = 64;
+  self->allocatedPageCount = 0;
   self->pageSizeInOctets = 4 * 1024 * 1024;
   self->basePointerForPages =
       tc_malloc(self->pageSizeInOctets * self->pageCount);
@@ -31,8 +32,9 @@ void imprintPageAllocatorAlloc(ImprintPageAllocator *self, size_t pageCount,
       self->freePages &= ~requestMask;
       result->pageIds = requestMask;
       result->memory = self->basePointerForPages + i * self->pageSizeInOctets;
-      CLOG_VERBOSE(">>>> pages %016lX allocated (%zu page count)", requestMask,
-                   pageCount)
+      self->allocatedPageCount += pageCount;
+      CLOG_DEBUG(">>>> pages %016lX allocated (%zu page count) (%zu allocated)", requestMask,
+                   pageCount, self->allocatedPageCount)
       return;
     }
 
@@ -78,14 +80,30 @@ void imprintPageAllocatorFreeSeparate(ImprintPageAllocator *self,
                                       ImprintPageIdList pageIds) {
   self->freePages |= pageIds;
 
-#if CONFIGURATION_DEBUG
-
+  CLOG_DEBUG(">>>> pages %016lX free (%zu allocated)", pageIds,
+                     self->allocatedPageCount)
+  uint64_t mask = 1;
   for (size_t i = 0; i < 64; ++i) {
-    uint64_t mask = 1 << i;
     if (pageIds & mask) {
+      if (self->allocatedPageCount == 0) {
+        CLOG_ERROR("too many free")
+      }
+      self->allocatedPageCount--;
+    }
+    mask <<= 1;
+  }
+
+//  CLOG_DEBUG(">>>> pages %016lX free (%zu allocated)", pageIds,
+  //                   self->allocatedPageCount)
+
+#if CONFIGURATION_DEBUG
+  uint64_t xmask = 1;
+  for (size_t i = 0; i < 64; ++i) {
+    if (pageIds & xmask) {
       tc_memset_octets(self->basePointerForPages + i * self->pageSizeInOctets,
                        0xbd, self->pageSizeInOctets);
     }
+    xmask <<= 1;
   }
 
 #endif
