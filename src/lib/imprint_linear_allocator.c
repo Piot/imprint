@@ -30,17 +30,26 @@ static inline void *imprintLinearAllocatorAlloc(ImprintLinearAllocator *self, si
     return 0;
   }
 
+  size_t align = 8;
   if (self->memory == 0) {
     CLOG_ERROR("Null memory!")
   }
+
+  size_t rest = (uintptr_t )self->next % align;
+  if (align != 0) {
+    self->next += align - rest;
+  }
+
   size_t allocated = self->next - self->memory;
+  CLOG_VERBOSE("linear allocate %zu (%zu out of %zu) %p", size, allocated, self->size, self->next)
+
   if (allocated + size > self->size) {
     CLOG_ERROR("Error: Out of memory! %s %zu %zu (%zu/%zu)", self->debug, size,
                allocated / size, allocated, self->size)
   }
   uint8_t *next = self->next;
   self->next += size;
-  allocated += size;
+
 
   // IMPRINT_LOG("alloc '%s' %d (%d / %d)", self->debug, size, allocated,
   // self->size);
@@ -61,7 +70,7 @@ void *imprintLinearAllocatorAllocDebug(ImprintLinearAllocator *self, size_t size
   }
   void *p = imprintLinearAllocatorAlloc(self, size);
   if (size > 0 && p == 0) {
-    CLOG_WARN("Out of memory %zu %s:%d '%s'", size, source_file, line,
+    CLOG_ERROR("Out of memory %zu %s:%d '%s'", size, source_file, line,
               description)
   }
   return p;

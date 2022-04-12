@@ -3,10 +3,11 @@
  *  Licensed under the MIT License. See LICENSE in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 #include <clog/clog.h>
+#include <imprint/allocator.h>
 #include <imprint/memory.h>
 #include <tiny-libc/tiny_libc.h>
 
-static void imprintMemoryInitEx(ImprintMemory *self, uint8_t *memory,
+void imprintMemoryInitEx(ImprintMemory *self, uint8_t *memory,
                                    size_t size, const char *debug) {
   self->memory = memory;
   self->next = self->memory;
@@ -20,8 +21,8 @@ void imprintMemoryDestroy(ImprintMemory *self)
     self->memory = 0;
 }
 
-void imprintMemoryInit(ImprintMemory *self, size_t size, const char *debug) {
-  uint8_t *memory = tc_malloc(size);
+void imprintMemoryInit(ImprintMemory *self, size_t size, const char *debug, ImprintAllocator* allocator) {
+  uint8_t *memory = IMPRINT_ALLOC(allocator, size, "memoryInit");
   imprintMemoryInitEx(self, memory, size, debug);
 }
 

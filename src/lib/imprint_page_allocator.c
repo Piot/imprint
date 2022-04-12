@@ -7,9 +7,10 @@
 
 void imprintPageAllocatorInit(ImprintPageAllocator* self, size_t pageCount)
 {
-    self->pageCount = pageCount;
-    self->pageSizeInOctets = 2 * 1024 * 1024;
-    self->basePointerForPages = tc_malloc(self->pageSizeInOctets * pageCount);
+    self->pageCount = 64;
+    self->pageSizeInOctets = 4 * 1024 * 1024;
+    self->basePointerForPages = tc_malloc(self->pageSizeInOctets * self->pageCount);
+    CLOG_VERBOSE("Allocated all page memory %zu (%zu count)", self->pageSizeInOctets, self->pageCount);
     self->freePages = ULONG_MAX;
 }
 
@@ -27,13 +28,14 @@ void imprintPageAllocatorAlloc(ImprintPageAllocator* self, size_t pageCount, Imp
             self->freePages &= ~requestMask;
             result->pageIds = requestMask;
             result->memory = self->basePointerForPages + i * self->pageSizeInOctets;
+            CLOG_VERBOSE("pages %016X allocated (%zu page count)", requestMask, pageCount)
             return;
         }
 
         requestMask <<= 1;
     }
 
-    CLOG_ERROR("page allocator: out of memory");
+    CLOG_ERROR("page allocator: out of memory pageCount %zu freeMask %016X", pageCount, self->freePages);
 }
 
 void imprintPageAllocatorFree(ImprintPageAllocator* self, ImprintPageIdList pageIds)

@@ -9,6 +9,8 @@
 #include <memory.h>
 #include <stdint.h>
 
+struct ImprintAllocator;
+
 typedef struct ImprintMemory {
   uint8_t *memory;
   size_t size;
@@ -25,7 +27,12 @@ void *imprint_memory_calloc_debug(struct ImprintMemory *memory, size_t size,
                                   const char *description);
 
 void imprintMemoryInit(struct ImprintMemory *memory, size_t size,
-                         const char *debug);
+                         const char *debug, struct  ImprintAllocator* allocator);
+
+void imprintMemoryInitEx(struct ImprintMemory *memory, uint8_t* ptr, size_t size,
+                       const char *debug);
+
+
 void imprintMemoryDestroy(ImprintMemory *self);
 void imprint_memory_clear(struct ImprintMemory *memory);
 void imprint_memory_print_debug(const struct ImprintMemory *memory);

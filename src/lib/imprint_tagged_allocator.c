@@ -1,7 +1,7 @@
+#include <clog/clog.h>
 #include <imprint/tagged_allocator.h>
 #include <imprint/tagged_page_allocator.h>
 #include <tiny-libc/tiny_libc.h>
-
 
 static inline void prepareMemory(ImprintTaggedAllocator *self, size_t size) {
   size_t currentUsedSize = (uintptr_t)(self->linear.next - self->linear.memory);
@@ -27,10 +27,16 @@ static void *imprintTaggedAllocatorAllocDebug(void *self_,
   }
 
   ImprintTaggedAllocator* self = (ImprintTaggedAllocator*) self_;
+  CLOG_VERBOSE("allocate %zu out of %zu", size, self->linear.size - (uintptr_t)(self->linear.next - self->linear.memory));
+
   prepareMemory(self, size);
 
-  return imprintLinearAllocatorAllocDebug(&self->linear, size, sourceFile, line,
+  void* memory = imprintLinearAllocatorAllocDebug(&self->linear, size, sourceFile, line,
                                           description);
+
+  tc_memset_octets(memory, 0xfa, size);
+
+  return memory;
 }
 
 static void *imprintTaggedAllocatorCallocDebug(void *self_,
