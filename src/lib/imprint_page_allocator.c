@@ -16,7 +16,7 @@ void imprintPageAllocatorInit(ImprintPageAllocator *self, size_t pageCount) {
 
 void imprintPageAllocatorDestroy(ImprintPageAllocator *self) {
   if (self->freePages != ULONG_MAX) {
-    CLOG_ERROR("pages %016X was not cleared", self->freePages)
+    CLOG_ERROR("pages %016lX was not cleared", self->freePages)
   }
   tc_free(self->basePointerForPages);
   self->basePointerForPages = 0;
@@ -31,7 +31,7 @@ void imprintPageAllocatorAlloc(ImprintPageAllocator *self, size_t pageCount,
       self->freePages &= ~requestMask;
       result->pageIds = requestMask;
       result->memory = self->basePointerForPages + i * self->pageSizeInOctets;
-      CLOG_VERBOSE("pages %016X allocated (%zu page count)", requestMask,
+      CLOG_VERBOSE(">>>> pages %016lX allocated (%zu page count)", requestMask,
                    pageCount)
       return;
     }
@@ -39,7 +39,7 @@ void imprintPageAllocatorAlloc(ImprintPageAllocator *self, size_t pageCount,
     requestMask <<= 1;
   }
 
-  CLOG_ERROR("page allocator: out of memory pageCount %zu freeMask %016X",
+  CLOG_ERROR("page allocator: out of memory pageCount %zu freeMask %016lX",
              pageCount, self->freePages);
 }
 

@@ -20,7 +20,7 @@ char *imprintSizeToString(char *buf, size_t bufSize, size_t size) {
 
   int value = size / factor;
 
-  tc_snprintf(buf, bufSize, "%d %s", value, suffix);
+  tc_snprintf(buf, bufSize, "%d%s", value, suffix);
 
   return buf;
 }

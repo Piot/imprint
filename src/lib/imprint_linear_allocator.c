@@ -34,8 +34,9 @@ static inline void *imprintLinearAllocatorAlloc(ImprintLinearAllocator *self,
 
   size_t allocated = self->next - self->memory;
 
+  char buf1[64];
   char buf[64];
-  CLOG_VERBOSE("linear allocate %zu %s", size,
+  CLOG_VERBOSE(">>>> linear allocate %s %s", imprintSizeToString(buf1, 64, size),
                imprintSizeAndPercentageToString(buf, 64, allocated, self->size))
 
   if (allocated + size > self->size) {
@@ -44,11 +45,6 @@ static inline void *imprintLinearAllocatorAlloc(ImprintLinearAllocator *self,
   }
   uint8_t *next = self->next;
   self->next += size;
-
-#if 1
-  char sizeBuf[32];
-  CLOG_VERBOSE("allocated %s", imprintSizeToString(sizeBuf, 32, size));
-#endif
 
   return next;
 }
