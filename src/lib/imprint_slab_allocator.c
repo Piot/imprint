@@ -38,7 +38,7 @@ void imprintSlabAllocatorInit(ImprintSlabAllocator *self,
     CLOG_ERROR("not supported")
   }
 
-  size_t arraySize = 128;
+  size_t arraySize = 64;
   for (size_t i = 0; i < capacity; ++i) {
     imprintSlabCacheInit(&self->caches[i], allocator, powerOfTwo + i, arraySize,
                          debug);

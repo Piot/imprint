@@ -6,6 +6,7 @@
 #include <imprint/allocator.h>
 #include <imprint/memory.h>
 #include <tiny-libc/tiny_libc.h>
+#include <imprint/utils.h>
 
 void imprintMemoryInitEx(ImprintMemory *self, uint8_t *memory,
                                    size_t size, const char *debug) {
@@ -30,36 +31,13 @@ void imprint_memory_clear(struct ImprintMemory *self) {
   self->next = self->memory;
 }
 
-static void size_string(char *buf, int size, int max_size) {
-  const int KILOBYTE = 1024;
-  const int MEGABYTE = 1024 * KILOBYTE;
-  int factor;
-  char *suffix;
 
-  if (size >= MEGABYTE) {
-    suffix = "M";
-    factor = MEGABYTE;
-  } else if (size >= KILOBYTE) {
-    suffix = "K";
-    factor = KILOBYTE;
-  } else {
-    suffix = "b";
-    factor = 1;
-  }
-
-  int value = size / factor;
-  int percentage = 100;
-  if (max_size != 0) {
-    percentage = 100 * size / max_size;
-  }
-  sprintf(buf, "%d %s (%d %%)", value, suffix, percentage);
-}
 
 void imprint_memory_print_debug(const ImprintMemory *self) {
   size_t allocated = self->next - self->memory;
   char buf[32];
-  size_string(buf, allocated, self->size);
-  CLOG_INFO("mem %s %s", self->debug, buf)
+
+  CLOG_INFO("mem %s %s", self->debug, imprintSizeAndPercentageToString(buf, 32, allocated, self->size))
 }
 
 static void *imprintMemoryAlloc(ImprintMemory *self, size_t size) {

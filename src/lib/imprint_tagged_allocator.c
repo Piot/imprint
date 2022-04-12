@@ -2,6 +2,7 @@
 #include <imprint/tagged_allocator.h>
 #include <imprint/tagged_page_allocator.h>
 #include <tiny-libc/tiny_libc.h>
+#include <imprint/utils.h>
 
 static inline void prepareMemory(ImprintTaggedAllocator *self, size_t size) {
   size_t currentUsedSize = (uintptr_t)(self->linear.next - self->linear.memory);
@@ -27,7 +28,9 @@ static void *imprintTaggedAllocatorAllocDebug(void *self_,
   }
 
   ImprintTaggedAllocator* self = (ImprintTaggedAllocator*) self_;
-  CLOG_VERBOSE("allocate %zu out of %zu", size, self->linear.size - (uintptr_t)(self->linear.next - self->linear.memory));
+
+  char buf[32];
+  CLOG_VERBOSE("allocate %zu out of %s", size, imprintSizeAndPercentageToString(buf, 32, (uintptr_t)(self->linear.next - self->linear.memory), self->linear.size));
 
   prepareMemory(self, size);
 

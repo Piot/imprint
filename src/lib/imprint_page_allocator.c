@@ -10,12 +10,15 @@ void imprintPageAllocatorInit(ImprintPageAllocator* self, size_t pageCount)
     self->pageCount = 64;
     self->pageSizeInOctets = 4 * 1024 * 1024;
     self->basePointerForPages = tc_malloc(self->pageSizeInOctets * self->pageCount);
-    CLOG_VERBOSE("Allocated all page memory %zu (%zu count)", self->pageSizeInOctets, self->pageCount);
+    CLOG_VERBOSE("=== Allocated all page memory %zu (%zu count)", self->pageSizeInOctets, self->pageCount);
     self->freePages = ULONG_MAX;
 }
 
 void imprintPageAllocatorDestroy(ImprintPageAllocator* self)
 {
+  if (self->freePages != ULONG_MAX) {
+    CLOG_ERROR("pages %016X was not cleared", self->freePages)
+  }
     tc_free(self->basePointerForPages);
     self->basePointerForPages = 0;
 }
@@ -61,7 +64,7 @@ void imprintPageAllocatorFree(ImprintPageAllocator* self, ImprintPageIdList page
         mask <<= 1;
     }
 
-    size_t pageCount = stop - start;
+    size_t pageCount = stop - start + 1;
 
     tc_memset_octets(self->basePointerForPages + start * self->pageSizeInOctets, 0xbd, pageCount * self->pageSizeInOctets);
 

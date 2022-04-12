@@ -16,6 +16,8 @@ typedef struct ImprintSlabCacheEntry {
   const char* file;
   size_t line;
   const char* description;
+  void* allocatedPointer;
+  size_t debugIndex;
 //  int generation;
   //bool marked_as_keep;
 } ImprintSlabCacheEntry;
@@ -24,6 +26,7 @@ typedef struct ImprintSlabCacheEntry {
 typedef struct ImprintSlabCache {
     uint8_t* memory;
     size_t structSize;
+    size_t structAlign;
     size_t totalSize;
     size_t capacity;
     size_t allocatedCount;

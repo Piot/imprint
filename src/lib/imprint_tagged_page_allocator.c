@@ -7,6 +7,7 @@ void imprintTaggedPageAllocatorInit(ImprintTaggedPageAllocator* self, ImprintPag
     self->entryCapacity = 32;
     for (size_t i=0; i<self->entryCapacity; ++i) {
         self->entries[i].tag = 0;
+        self->entries[i].pageIds = 0;
     }
 }
 
@@ -15,7 +16,8 @@ void imprintTaggedPageAllocatorDestroy(ImprintTaggedPageAllocator* self)
     for (size_t i=0; i<self->entryCapacity; ++i) {
         ImprintTaggedPageEntry* entry = &self->entries[i];
         if (entry->tag) {
-            imprintPageAllocatorFree(self->pageAllocator, entry->pageIds);
+            CLOG_ERROR("tag %016X with pages %016X was not cleared", entry->tag, entry->pageIds);
+            //imprintPageAllocatorFree(self->pageAllocator, entry->pageIds);
             entry->tag = 0;
         }
     }

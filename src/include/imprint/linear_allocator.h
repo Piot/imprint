@@ -4,9 +4,10 @@
 #include <stdint.h>
 #include <stddef.h>
 
-struct ImprintAllocator;
+#include <imprint/allocator.h>
 
 typedef struct ImprintLinearAllocator {
+  ImprintAllocator info;
   uint8_t *memory;
   size_t size;
   uint8_t *next;
