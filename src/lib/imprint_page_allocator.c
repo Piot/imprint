@@ -1,5 +1,6 @@
 #include <clog/clog.h>
 #include <imprint/page_allocator.h>
+#include <imprint/utils.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <tiny-libc/tiny_libc.h>
@@ -25,6 +26,9 @@ void imprintPageAllocatorDestroy(ImprintPageAllocator *self) {
 
 void imprintPageAllocatorAlloc(ImprintPageAllocator *self, size_t pageCount,
                                ImprintPageResult *result) {
+    if (pageCount >= 3) {
+        CLOG_WARN("Big chunk allocated")
+    }
   uint64_t requestMask = ((1 << pageCount) - 1);
   for (size_t i = 0; i < 64 - pageCount; ++i) {
     uint64_t usedAndRequestMask = self->freePages & requestMask;
@@ -33,8 +37,9 @@ void imprintPageAllocatorAlloc(ImprintPageAllocator *self, size_t pageCount,
       result->pageIds = requestMask;
       result->memory = self->basePointerForPages + i * self->pageSizeInOctets;
       self->allocatedPageCount += pageCount;
-      CLOG_DEBUG(">>>> pages %016lX allocated (%zu page count) (%zu allocated)", requestMask,
-                   pageCount, self->allocatedPageCount)
+      char buf[32];
+      CLOG_DEBUG(">>>> pages %016lX allocated (%zu page count) (%zu, %s allocated)", requestMask,
+                   pageCount, self->allocatedPageCount, imprintSizeToString(buf, 32, self->allocatedPageCount* self->pageSizeInOctets))
       return;
     }
 
@@ -80,8 +85,9 @@ void imprintPageAllocatorFreeSeparate(ImprintPageAllocator *self,
                                       ImprintPageIdList pageIds) {
   self->freePages |= pageIds;
 
-  CLOG_DEBUG(">>>> pages %016lX free (%zu allocated)", pageIds,
-                     self->allocatedPageCount)
+  char buf[32];
+  CLOG_DEBUG(">>>> pages %016lX free (%zu, %s allocated)", pageIds,
+                     self->allocatedPageCount, imprintSizeToString(buf, 32, self->allocatedPageCount* self->pageSizeInOctets))
   uint64_t mask = 1;
   for (size_t i = 0; i < 64; ++i) {
     if (pageIds & mask) {
