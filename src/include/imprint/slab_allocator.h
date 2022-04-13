@@ -12,7 +12,7 @@ typedef struct ImprintSlabAllocator {
 
 void imprintSlabAllocatorInit(ImprintSlabAllocator *self,
                                ImprintAllocator *allocator,
-                               size_t powerOfTwo, size_t capacity,
+                               size_t powerOfTwo, size_t capacity, size_t arraySize,
                                const char *debug);
 
 

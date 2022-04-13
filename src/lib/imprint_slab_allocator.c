@@ -32,12 +32,11 @@ static void imprintSlabAllocatorFree(void *self_, void *ptr,
 
 void imprintSlabAllocatorInit(ImprintSlabAllocator *self,
                               ImprintAllocator *allocator, size_t powerOfTwo,
-                              size_t capacity, const char *debug) {
+                              size_t capacity, size_t arraySize, const char *debug) {
   if (capacity > 4) {
     CLOG_ERROR("not supported")
   }
 
-  size_t arraySize = 64;
   for (size_t i = 0; i < capacity; ++i) {
     imprintSlabCacheInit(&self->caches[i], allocator, powerOfTwo + i, arraySize,
                          debug);

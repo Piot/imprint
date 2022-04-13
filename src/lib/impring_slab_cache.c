@@ -2,6 +2,7 @@
 #include <imprint/allocator.h>
 #include <imprint/slab_cache.h>
 #include <imprint/tagged_allocator.h>
+#include <imprint/utils.h>
 
 void imprintSlabCacheInit(ImprintSlabCache *self, ImprintAllocator *allocator,
                           size_t powerOfTwo, size_t capacity,
@@ -63,11 +64,17 @@ void *imprintSlabCacheAlloc(ImprintSlabCache *self, size_t size,
   e->file = file;
   e->description = debug;
   e->allocatedPointer = m;
+  e->usedOctetSize = size;
+  e->isAllocated = true;
 
   self->firstFreeEntry = e->nextFreeEntry;
   self->allocatedCount++;
-  e->isAllocated = true;
 
+#if CLOG_LOG_ENABLED
+  char buf[32];
+  char buf1[32];
+  CLOG_VERBOSE(">>>> slab: allocate index %zu %s (%s %zu/%zu)", e->debugIndex, imprintSizeToString(buf1, 32, e->usedOctetSize), imprintSizeToString(buf, 32, self->structSize), self->allocatedCount, self->capacity)
+#endif
   return m;
 }
 
@@ -135,6 +142,13 @@ bool imprintSlabCacheTryToFree(ImprintSlabCache *self, void *ptr) {
     CLOG_ERROR("multiple free")
     return false;
   }
+#if CLOG_LOG_ENABLED
+
+  char buf[32];
+  char buf1[32];
+  CLOG_VERBOSE(">>>> slab: release index %zu used:%s (%s %zu/%zu)", foundEntry->debugIndex, imprintSizeToString(buf1, 32, foundEntry->usedOctetSize), imprintSizeToString(buf, 32, self->structSize), self->allocatedCount, self->capacity)
+#endif
+
   freeEntry(self, foundEntry);
 
   return true;

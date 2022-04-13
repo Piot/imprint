@@ -18,8 +18,7 @@ typedef struct ImprintSlabCacheEntry {
   const char* description;
   void* allocatedPointer;
   size_t debugIndex;
-//  int generation;
-  //bool marked_as_keep;
+  size_t usedOctetSize;
 } ImprintSlabCacheEntry;
 
 

@@ -32,7 +32,7 @@ static void *imprintTaggedAllocatorAllocDebug(void *self_, size_t size,
 
   char buf[32];
   char buf1[32];
-  CLOG_VERBOSE(">>>> allocate %s out of %s", imprintSizeToString(buf1, 32, size),
+  CLOG_VERBOSE(">>>> allocate %s (%s)", imprintSizeToString(buf1, 32, size),
                imprintSizeAndPercentageToString(
                    buf, 32,
                    (uintptr_t)(self->linear.next - self->linear.memory),
