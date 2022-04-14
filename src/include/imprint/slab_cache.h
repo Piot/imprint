@@ -36,8 +36,8 @@ typedef struct ImprintSlabCache {
 
 void imprintSlabCacheInit(ImprintSlabCache* self, ImprintAllocator *allocator, size_t powerOfTwo, size_t capacity, const char* debug);
 
-void* imprintSlabCacheAlloc(ImprintSlabCache* self, size_t octetCount, const char* file, size_t line, const char* debug);
-
+void* imprintSlabCacheAllocDebug(ImprintSlabCache* self, size_t octetCount, const char* file, size_t line, const char* debug);
+void *imprintSlabCacheAlloc(ImprintSlabCache *self, size_t size);
 bool imprintSlabCacheTryToFree(ImprintSlabCache* self, void* ptr);
 
 

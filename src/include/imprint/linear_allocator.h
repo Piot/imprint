@@ -21,7 +21,8 @@ void imprintLinearAllocatorInit(ImprintLinearAllocator *self, uint8_t *memory,
 void imprintLinearAllocatorSelfAlloc(ImprintLinearAllocator *self, struct ImprintAllocator* allocator,
                                      size_t size, const char *debug);
 void imprintLinearAllocatorReset(ImprintLinearAllocator* self);
-//static inline void *imprintLinearAllocatorAlloc(ImprintLinearAllocator *self, size_t size);
+
+void *imprintLinearAllocatorAlloc(ImprintLinearAllocator *self, size_t size);
 
 void *imprintLinearAllocatorAllocDebug(ImprintLinearAllocator *self, size_t size,
                                  const char *source_file, int line,

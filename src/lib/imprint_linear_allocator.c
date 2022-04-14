@@ -13,7 +13,7 @@ void imprintLinearAllocatorReset(ImprintLinearAllocator *self) {
   self->next = self->memory;
 }
 
-static inline void *imprintLinearAllocatorAlloc(ImprintLinearAllocator *self,
+inline void *imprintLinearAllocatorAlloc(ImprintLinearAllocator *self,
                                                 size_t size) {
   if (self == 0) {
     CLOG_ERROR("NULL memory %lu  '%s'", size, self->debug)
@@ -67,14 +67,21 @@ void *imprintLinearAllocatorAllocDebug(ImprintLinearAllocator *self,
   return p;
 }
 
+static void *imprintLinearAllocatorAllocInternal(void *self_, size_t size
+                                                      ) {
+  ImprintLinearAllocator *self = (ImprintLinearAllocator *)self_;
+
+  return imprintLinearAllocatorAlloc(self, size);
+}
+
+
 static void *imprintLinearAllocatorAllocDebugInternal(void *self_, size_t size,
                                                       const char *sourceFile,
                                                       size_t lineNumber,
                                                       const char *description) {
   ImprintLinearAllocator *self = (ImprintLinearAllocator *)self_;
 
-  return imprintLinearAllocatorAllocDebug(self, size, sourceFile, lineNumber,
-                                          description);
+  return imprintLinearAllocatorAllocDebug(self, size, sourceFile, lineNumber, description);
 }
 
 static void *imprintLinearAllocatorCalloc(ImprintLinearAllocator *self,
@@ -112,12 +119,25 @@ static void *imprintLinearAllocatorCallocDebugInternal(
                                            description);
 }
 
+static void *imprintLinearAllocatorCallocInternal(
+    void *self_, size_t size) {
+  ImprintLinearAllocator *self = (ImprintLinearAllocator *)self_;
+
+  return imprintLinearAllocatorCalloc(self, size);
+}
+
+
 void imprintLinearAllocatorInit(ImprintLinearAllocator *self, uint8_t *memory,
                                 size_t size, const char *debug) {
   self->memory = memory;
   self->next = self->memory;
   self->size = size;
   self->debug = debug;
+  #if CONFIGURATION_DEBUG
   self->info.allocDebugFn = imprintLinearAllocatorAllocDebugInternal;
   self->info.callocDebugFn = imprintLinearAllocatorCallocDebugInternal;
+  #else
+  self->info.allocFn = imprintLinearAllocatorAllocInternal;
+  self->info.callocFn = imprintLinearAllocatorCallocInternal;
+  #endif
 }

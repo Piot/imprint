@@ -37,38 +37,59 @@ void imprintSlabCacheInit(ImprintSlabCache *self, ImprintAllocator *allocator,
   }
 }
 
-void *imprintSlabCacheAlloc(ImprintSlabCache *self, size_t size,
+static inline void *imprintSlabCacheAllocInternal(ImprintSlabCache *self, size_t size, ImprintSlabCacheEntry** outEntry)
+{
+    CLOG_ASSERT(self->allocatedCount < self->capacity,
+                "Out of memory in self (%zu out of %zu) for size %zu. %s",
+                self->allocatedCount, self->capacity, self->structSize,
+                self->debug)
+
+    if (self->firstFreeEntry == 0) {
+        CLOG_INFO("First free is not available")
+        return 0;
+    }
+    ImprintSlabCacheEntry *e = self->firstFreeEntry;
+    CLOG_ASSERT(e, "first free is null")
+    CLOG_ASSERT(!e->isAllocated, "entry already allocated")
+
+    size_t foundIndex = (e - self->entries);
+
+    if (e->debugIndex != foundIndex) {
+        CLOG_ERROR("internal error looking up foundIndex")
+    }
+
+    uint8_t *m = (uint8_t *)self->memory + (foundIndex * self->structSize);
+    *outEntry = e;
+    self->firstFreeEntry = e->nextFreeEntry;
+    self->allocatedCount++;
+    e->isAllocated = true;
+    e->allocatedPointer = m;
+    e->usedOctetSize = size;
+
+    return m;
+}
+
+
+void *imprintSlabCacheAlloc(ImprintSlabCache *self, size_t size)
+{
+    ImprintSlabCacheEntry* e;
+    void* m = imprintSlabCacheAllocInternal(self, size, &e);
+    return m;
+}
+
+void *imprintSlabCacheAllocDebug(ImprintSlabCache *self, size_t size,
                             const char *file, size_t line, const char *debug) {
-  CLOG_ASSERT(self->allocatedCount < self->capacity,
-              "Out of memory in self (%zu out of %zu) for size %zu. %s %s:%d",
-              self->allocatedCount, self->capacity, self->structSize,
-              self->debug, file, line)
-
-  if (self->firstFreeEntry == 0) {
-    CLOG_INFO("First free is not available")
-    return 0;
-  }
-  ImprintSlabCacheEntry *e = self->firstFreeEntry;
-  CLOG_ASSERT(e, "first free is null")
-  CLOG_ASSERT(!e->isAllocated, "entry already allocated")
-
-  size_t foundIndex = (e - self->entries);
-
-  if (e->debugIndex != foundIndex) {
-    CLOG_ERROR("internal error looking up foundIndex")
-  }
-
-  uint8_t *m = (uint8_t *)self->memory + (foundIndex * self->structSize);
-
+    CLOG_ASSERT(self->allocatedCount < self->capacity,
+                "Out of memory in self (%zu out of %zu) for size %zu. %s %s:%d",
+                self->allocatedCount, self->capacity, self->structSize,
+                self->debug, file, line)
+    ImprintSlabCacheEntry* e;
+    void* m = imprintSlabCacheAllocInternal(self, size, &e);
   e->line = line;
   e->file = file;
   e->description = debug;
-  e->allocatedPointer = m;
-  e->usedOctetSize = size;
-  e->isAllocated = true;
 
-  self->firstFreeEntry = e->nextFreeEntry;
-  self->allocatedCount++;
+
 
 #if CLOG_LOG_ENABLED
   char buf[32];
