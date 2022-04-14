@@ -1,7 +1,7 @@
 #include <clog/clog.h>
 #include <imprint/slab_allocator.h>
 
-static void *imprintSlabAllocatorAllocDebug(void *self_, size_t size,
+static inline void *imprintSlabAllocatorAllocDebug(void *self_, size_t size,
                                        const char *sourceFile, size_t line,
                                        const char *description) {
   ImprintSlabAllocator *self = (ImprintSlabAllocator *)self_;
@@ -15,7 +15,7 @@ static void *imprintSlabAllocatorAllocDebug(void *self_, size_t size,
   CLOG_ERROR("unsupported size %zu", size);
 }
 
-static void *imprintSlabAllocatorAlloc(void *self_, size_t size) {
+static inline void *imprintSlabAllocatorAlloc(void *self_, size_t size) {
     ImprintSlabAllocator *self = (ImprintSlabAllocator *)self_;
     for (size_t i = 0; i < self->cacheCount; ++i) {
         ImprintSlabCache *cache = &self->caches[i];
@@ -44,7 +44,7 @@ static void imprintSlabAllocatorFreeDebug(void *self_, void *ptr,
 }
 
 
-static void imprintSlabAllocatorFree(void *self_, void *ptr) {
+static inline void imprintSlabAllocatorFree(void *self_, void *ptr) {
     ImprintSlabAllocator *self = (ImprintSlabAllocator *)self_;
     for (size_t i = 0; i < self->cacheCount; ++i) {
         ImprintSlabCache *cache = &self->caches[i];

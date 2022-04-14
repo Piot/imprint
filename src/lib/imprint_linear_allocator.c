@@ -13,7 +13,7 @@ void imprintLinearAllocatorReset(ImprintLinearAllocator *self) {
   self->next = self->memory;
 }
 
-inline void *imprintLinearAllocatorAlloc(ImprintLinearAllocator *self,
+void *imprintLinearAllocatorAlloc(ImprintLinearAllocator *self,
                                                 size_t size) {
   if (self == 0) {
     CLOG_ERROR("NULL memory %lu  '%s'", size, self->debug)
