@@ -5,22 +5,21 @@
 #include <stddef.h>
 
 typedef struct ImprintSlabCacheEntryDebug {
-   const char *file;
-   int line;
-   const char* description;
+    const char* file;
+    int line;
+    const char* description;
 } ImprintSlabCacheEntryDebug;
 
 typedef struct ImprintSlabCacheEntry {
-  bool isAllocated;
-  struct ImprintSlabCacheEntry* nextFreeEntry;
-  const char* file;
-  size_t line;
-  const char* description;
-  void* allocatedPointer;
-  size_t debugIndex;
-  size_t usedOctetSize;
+    bool isAllocated;
+    struct ImprintSlabCacheEntry* nextFreeEntry;
+    const char* file;
+    size_t line;
+    const char* description;
+    void* allocatedPointer;
+    size_t debugIndex;
+    size_t usedOctetSize;
 } ImprintSlabCacheEntry;
-
 
 typedef struct ImprintSlabCache {
     uint8_t* memory;
@@ -34,12 +33,12 @@ typedef struct ImprintSlabCache {
     const char* debug;
 } ImprintSlabCache;
 
-void imprintSlabCacheInit(ImprintSlabCache* self, ImprintAllocator *allocator, size_t powerOfTwo, size_t capacity, const char* debug);
+void imprintSlabCacheInit(ImprintSlabCache* self, ImprintAllocator* allocator, size_t powerOfTwo, size_t capacity,
+                          const char* debug);
 
-void* imprintSlabCacheAllocDebug(ImprintSlabCache* self, size_t octetCount, const char* file, size_t line, const char* debug);
-void *imprintSlabCacheAlloc(ImprintSlabCache *self, size_t size);
+void* imprintSlabCacheAllocDebug(ImprintSlabCache* self, size_t octetCount, const char* file, size_t line,
+                                 const char* debug);
+void* imprintSlabCacheAlloc(ImprintSlabCache* self, size_t size);
 bool imprintSlabCacheTryToFree(ImprintSlabCache* self, void* ptr);
 
-
 #endif
-

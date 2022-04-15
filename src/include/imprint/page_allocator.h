@@ -1,8 +1,8 @@
 #ifndef IMPRINT_PAGE_ALLOCATOR_H
 #define IMPRINT_PAGE_ALLOCATOR_H
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 typedef uint64_t ImprintPageIdList;
 

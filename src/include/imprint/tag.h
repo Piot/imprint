@@ -5,6 +5,4 @@
 
 uint64_t imprintTagFromString(char tag[8]);
 
-
 #endif
-

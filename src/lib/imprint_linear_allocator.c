@@ -2,142 +2,134 @@
 #include <imprint/linear_allocator.h>
 #include <imprint/utils.h>
 
-void imprintLinearAllocatorSelfAlloc(ImprintLinearAllocator *self,
-                                     ImprintAllocator *allocator, size_t size,
-                                     const char *debug) {
-  imprintLinearAllocatorInit(self, IMPRINT_ALLOC(allocator, size, debug), size,
-                             debug);
+void imprintLinearAllocatorSelfAlloc(ImprintLinearAllocator* self, ImprintAllocator* allocator, size_t size,
+                                     const char* debug)
+{
+    imprintLinearAllocatorInit(self, IMPRINT_ALLOC(allocator, size, debug), size, debug);
 }
 
-void imprintLinearAllocatorReset(ImprintLinearAllocator *self) {
-  self->next = self->memory;
+void imprintLinearAllocatorReset(ImprintLinearAllocator* self)
+{
+    self->next = self->memory;
 }
 
-void *imprintLinearAllocatorAlloc(ImprintLinearAllocator *self,
-                                                size_t size) {
-  if (self == 0) {
-    CLOG_ERROR("NULL memory %lu  '%s'", size, self->debug)
-  }
-  if (size == 0) {
-    return 0;
-  }
+void* imprintLinearAllocatorAlloc(ImprintLinearAllocator* self, size_t size)
+{
+    if (self == 0) {
+        CLOG_ERROR("NULL memory %lu  '%s'", size, self->debug)
+    }
+    if (size == 0) {
+        return 0;
+    }
 
-  size_t align = 8;
-  if (self->memory == 0) {
-    CLOG_ERROR("Null memory!")
-  }
+    size_t align = 8;
+    if (self->memory == 0) {
+        CLOG_ERROR("Null memory!")
+    }
 
-  size_t rest = (uintptr_t)self->next % align;
-  if (align != 0) {
-    self->next += align - rest;
-  }
+    size_t rest = (uintptr_t) self->next % align;
+    if (align != 0) {
+        self->next += align - rest;
+    }
 
-  size_t allocated = self->next - self->memory;
+    size_t allocated = self->next - self->memory;
 
-  char buf1[64];
-  char buf[64];
-  CLOG_VERBOSE(">>>> linear allocate %s %s", imprintSizeToString(buf1, 64, size),
-               imprintSizeAndPercentageToString(buf, 64, allocated, self->size))
+    char buf1[64];
+    char buf[64];
+    CLOG_VERBOSE(">>>> linear allocate %s %s", imprintSizeToString(buf1, 64, size),
+                 imprintSizeAndPercentageToString(buf, 64, allocated, self->size))
 
-  if (allocated + size > self->size) {
-    CLOG_ERROR("Error: Out of memory! %s %zu %zu (%zu/%zu)", self->debug, size,
-               allocated / size, allocated, self->size)
-  }
-  uint8_t *next = self->next;
-  self->next += size;
+    if (allocated + size > self->size) {
+        CLOG_ERROR("Error: Out of memory! %s %zu %zu (%zu/%zu)", self->debug, size, allocated / size, allocated,
+                   self->size)
+    }
+    uint8_t* next = self->next;
+    self->next += size;
 
-  return next;
+    return next;
 }
 
-void *imprintLinearAllocatorAllocDebug(ImprintLinearAllocator *self,
-                                       size_t size, const char *source_file,
-                                       int line, const char *description) {
-  if (self == 0) {
-    CLOG_ERROR("NULL memory %zu %s:%d '%s'", size, source_file, line,
-               description)
-  }
-  if (self->memory == 0) {
-    CLOG_ERROR("Memory is null")
-  }
-  void *p = imprintLinearAllocatorAlloc(self, size);
-  if (size > 0 && p == 0) {
-    CLOG_ERROR("Out of memory %zu %s:%d '%s'", size, source_file, line,
-               description)
-  }
-  return p;
-}
-
-static void *imprintLinearAllocatorAllocInternal(void *self_, size_t size
-                                                      ) {
-  ImprintLinearAllocator *self = (ImprintLinearAllocator *)self_;
-
-  return imprintLinearAllocatorAlloc(self, size);
-}
-
-
-static void *imprintLinearAllocatorAllocDebugInternal(void *self_, size_t size,
-                                                      const char *sourceFile,
-                                                      size_t lineNumber,
-                                                      const char *description) {
-  ImprintLinearAllocator *self = (ImprintLinearAllocator *)self_;
-
-  return imprintLinearAllocatorAllocDebug(self, size, sourceFile, lineNumber, description);
-}
-
-static void *imprintLinearAllocatorCalloc(ImprintLinearAllocator *self,
-                                          size_t size) {
-  void *p = imprintLinearAllocatorAlloc(self, size);
-  if (p == 0) {
+void* imprintLinearAllocatorAllocDebug(ImprintLinearAllocator* self, size_t size, const char* source_file, int line,
+                                       const char* description)
+{
+    if (self == 0) {
+        CLOG_ERROR("NULL memory %zu %s:%d '%s'", size, source_file, line, description)
+    }
+    if (self->memory == 0) {
+        CLOG_ERROR("Memory is null")
+    }
+    void* p = imprintLinearAllocatorAlloc(self, size);
+    if (size > 0 && p == 0) {
+        CLOG_ERROR("Out of memory %zu %s:%d '%s'", size, source_file, line, description)
+    }
     return p;
-  }
-  tc_mem_clear(p, size);
-  return p;
 }
 
-void *imprintLinearAllocatorCallocDebug(ImprintLinearAllocator *self,
-                                        size_t size, const char *source_file,
-                                        int line, const char *description) {
-  if (self == 0) {
-    CLOG_ERROR("NULL memory %zu %s:%d '%s'", size, source_file, line,
-               description)
-  }
+static void* imprintLinearAllocatorAllocInternal(void* self_, size_t size)
+{
+    ImprintLinearAllocator* self = (ImprintLinearAllocator*) self_;
 
-  void *p = imprintLinearAllocatorCalloc(self, size);
-  if (size > 0 && p == 0) {
-    CLOG_ERROR("Out of memory %zu %s:%d '%s'", size, source_file, line,
-               description)
-  }
-  return p;
+    return imprintLinearAllocatorAlloc(self, size);
 }
 
-static void *imprintLinearAllocatorCallocDebugInternal(
-    void *self_, size_t size, const char *sourceFile, size_t lineNumber,
-    const char *description) {
-  ImprintLinearAllocator *self = (ImprintLinearAllocator *)self_;
+static void* imprintLinearAllocatorAllocDebugInternal(void* self_, size_t size, const char* sourceFile,
+                                                      size_t lineNumber, const char* description)
+{
+    ImprintLinearAllocator* self = (ImprintLinearAllocator*) self_;
 
-  return imprintLinearAllocatorCallocDebug(self, size, sourceFile, lineNumber,
-                                           description);
+    return imprintLinearAllocatorAllocDebug(self, size, sourceFile, lineNumber, description);
 }
 
-static void *imprintLinearAllocatorCallocInternal(
-    void *self_, size_t size) {
-  ImprintLinearAllocator *self = (ImprintLinearAllocator *)self_;
-
-  return imprintLinearAllocatorCalloc(self, size);
+void* imprintLinearAllocatorCalloc(ImprintLinearAllocator* self, size_t size)
+{
+    void* p = imprintLinearAllocatorAlloc(self, size);
+    if (p == 0) {
+        return p;
+    }
+    tc_mem_clear(p, size);
+    return p;
 }
 
+void* imprintLinearAllocatorCallocDebug(ImprintLinearAllocator* self, size_t size, const char* source_file, int line,
+                                        const char* description)
+{
+    if (self == 0) {
+        CLOG_ERROR("NULL memory %zu %s:%d '%s'", size, source_file, line, description)
+    }
 
-void imprintLinearAllocatorInit(ImprintLinearAllocator *self, uint8_t *memory,
-                                size_t size, const char *debug) {
-  self->memory = memory;
-  self->next = self->memory;
-  self->size = size;
-  self->debug = debug;
-  #if CONFIGURATION_DEBUG
-  self->info.allocDebugFn = imprintLinearAllocatorAllocDebugInternal;
-  self->info.callocDebugFn = imprintLinearAllocatorCallocDebugInternal;
-  #else
-  self->info.allocFn = imprintLinearAllocatorAllocInternal;
-  self->info.callocFn = imprintLinearAllocatorCallocInternal;
-  #endif
+    void* p = imprintLinearAllocatorCalloc(self, size);
+    if (size > 0 && p == 0) {
+        CLOG_ERROR("Out of memory %zu %s:%d '%s'", size, source_file, line, description)
+    }
+    return p;
+}
+
+static void* imprintLinearAllocatorCallocDebugInternal(void* self_, size_t size, const char* sourceFile,
+                                                       size_t lineNumber, const char* description)
+{
+    ImprintLinearAllocator* self = (ImprintLinearAllocator*) self_;
+
+    return imprintLinearAllocatorCallocDebug(self, size, sourceFile, lineNumber, description);
+}
+
+static void* imprintLinearAllocatorCallocInternal(void* self_, size_t size)
+{
+    ImprintLinearAllocator* self = (ImprintLinearAllocator*) self_;
+
+    return imprintLinearAllocatorCalloc(self, size);
+}
+
+void imprintLinearAllocatorInit(ImprintLinearAllocator* self, uint8_t* memory, size_t size, const char* debug)
+{
+    self->memory = memory;
+    self->next = self->memory;
+    self->size = size;
+    self->debug = debug;
+#if CONFIGURATION_DEBUG
+    self->info.allocDebugFn = imprintLinearAllocatorAllocDebugInternal;
+    self->info.callocDebugFn = imprintLinearAllocatorCallocDebugInternal;
+#else
+    self->info.allocFn = imprintLinearAllocatorAllocInternal;
+    self->info.callocFn = imprintLinearAllocatorCallocInternal;
+#endif
 }

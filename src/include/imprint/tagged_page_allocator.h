@@ -1,8 +1,8 @@
 #ifndef IMPRINT_TAGGED_PAGE_ALLOCATOR_H
 #define IMPRINT_TAGGED_PAGE_ALLOCATOR_H
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #include <imprint/page_allocator.h>
 
@@ -19,7 +19,8 @@ typedef struct ImprintTaggedPageAllocator {
 
 void imprintTaggedPageAllocatorInit(ImprintTaggedPageAllocator* self, ImprintPageAllocator* pageAllocator);
 void imprintTaggedPageAllocatorDestroy(ImprintTaggedPageAllocator* self);
-void imprintTaggedPageAllocatorAlloc(ImprintTaggedPageAllocator* self, uint64_t tag, size_t pageCount, ImprintPageResult* result);
+void imprintTaggedPageAllocatorAlloc(ImprintTaggedPageAllocator* self, uint64_t tag, size_t pageCount,
+                                     ImprintPageResult* result);
 void imprintTaggedPageAllocatorFree(ImprintTaggedPageAllocator* self, uint64_t tag);
 
 #endif

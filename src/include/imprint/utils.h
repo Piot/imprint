@@ -3,7 +3,10 @@
 
 #include <stddef.h>
 
-char* imprintSizeToString(char *buf, size_t bufSize, size_t size);
-char* imprintSizeAndPercentageToString(char *buf, size_t bufSize, size_t size, size_t maximumSize);
+char* imprintSizeToString(char* buf, size_t bufSize, size_t size);
+const char* imprintSizeToStringStatic(size_t size);
+char* imprintSizeToStringEx(char* buf, size_t bufSize, size_t size, int flags);
+const char* imprintSizeToStringExStatic(size_t size, int flags);
+char* imprintSizeAndPercentageToString(char* buf, size_t bufSize, size_t size, size_t maximumSize);
 
 #endif
