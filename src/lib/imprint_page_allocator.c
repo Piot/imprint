@@ -9,7 +9,7 @@ void imprintPageAllocatorInit(ImprintPageAllocator* self, size_t pageCount)
 {
     self->pageCount = 64;
     self->allocatedPageCount = 0;
-    self->pageSizeInOctets = 4 * 1024 * 1024;
+    self->pageSizeInOctets = 2 * 1024 * 1024;
     self->basePointerForPages = tc_malloc(self->pageSizeInOctets * self->pageCount);
     CLOG_VERBOSE("=== Allocated all page memory %zu (%zu count)", self->pageSizeInOctets, self->pageCount);
     self->freePages = ULONG_MAX;
