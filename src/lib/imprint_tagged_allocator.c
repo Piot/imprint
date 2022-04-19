@@ -4,6 +4,8 @@
 #include <imprint/utils.h>
 #include <tiny-libc/tiny_libc.h>
 
+#define IMPRINT_TAGGED_ALLOCATOR_DETAILED_LOG (0)
+
 static inline void prepareMemory(ImprintTaggedAllocator* self, size_t size)
 {
     size_t currentUsedSize = (uintptr_t) (self->linear.next - self->linear.memory);
@@ -28,11 +30,13 @@ static void* imprintTaggedAllocatorAllocDebug(void* self_, size_t size, const ch
 
     ImprintTaggedAllocator* self = (ImprintTaggedAllocator*) self_;
 
+#if IMPRINT_TAGGED_ALLOCATOR_DETAILED_LOG
     char buf[32];
     char buf1[32];
     CLOG_VERBOSE(">>>> tag allocate %016X %s (%s)", self->tag, imprintSizeToString(buf1, 32, size),
                  imprintSizeAndPercentageToString(buf, 32, (uintptr_t) (self->linear.next - self->linear.memory),
                                                   self->linear.size));
+#endif
 
     prepareMemory(self, size);
 

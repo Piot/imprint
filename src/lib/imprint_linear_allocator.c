@@ -2,6 +2,8 @@
 #include <imprint/linear_allocator.h>
 #include <imprint/utils.h>
 
+#define IMPRINT_LINEAR_ALLOCATOR_DETAILED_LOG (0)
+
 void imprintLinearAllocatorSelfAlloc(ImprintLinearAllocator* self, ImprintAllocator* allocator, size_t size,
                                      const char* debug)
 {
@@ -34,11 +36,12 @@ void* imprintLinearAllocatorAlloc(ImprintLinearAllocator* self, size_t size)
 
     size_t allocated = self->next - self->memory;
 
+#if IMPRINT_LINEAR_ALLOCATOR_DETAILED_LOG
     char buf1[64];
     char buf[64];
     CLOG_VERBOSE(">>>> linear allocate %s %s", imprintSizeToString(buf1, 64, size),
                  imprintSizeAndPercentageToString(buf, 64, allocated, self->size))
-
+#endif
     if (allocated + size > self->size) {
         CLOG_ERROR("Error: Out of memory! %s %zu %zu (%zu/%zu)", self->debug, size, allocated / size, allocated,
                    self->size)

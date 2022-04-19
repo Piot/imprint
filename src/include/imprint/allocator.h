@@ -2,6 +2,7 @@
 #define IMPRINT_ALLOCATOR_H
 
 #include <stddef.h>
+#include <tiny-libc/tiny_libc.h>
 
 typedef void* (*ImprintAllocDebugFn)(void* self_, size_t size, const char* sourceFile, size_t lineNumber,
                                      const char* description);
@@ -43,11 +44,23 @@ typedef struct ImprintAllocatorWithFree {
 #define IMPRINT_FREE(allocatorInfoWithFree, ptr) (allocatorInfoWithFree)->freeFn(allocatorInfoWithFree, (void*) (ptr))
 #endif
 
+
+
 #define IMPRINT_CALLOC_TYPE_COUNT(allocatorInfo, type, count)                                                          \
     (type*) IMPRINT_CALLOC(allocatorInfo, count * sizeof(type), #type)
 #define IMPRINT_CALLOC_TYPE(allocatorInfo, type) (type*) IMPRINT_CALLOC(allocatorInfo, sizeof(type), #type)
 #define IMPRINT_ALLOC_TYPE(allocatorInfo, type) (type*) IMPRINT_ALLOC(allocatorInfo, sizeof(type), #type)
 #define IMPRINT_ALLOC_TYPE_COUNT(allocatorInfo, type, count)                                                           \
     (type*) IMPRINT_ALLOC(allocatorInfo, count * sizeof(type), #type)
+
+
+static inline char* imprintStrDup(ImprintAllocator* allocator, const char* str)
+{
+  size_t len = tc_strlen(str);
+  char* buf = IMPRINT_ALLOC_TYPE_COUNT(allocator, char, len+1);
+  tc_memcpy_octets(buf, str, len+1);
+
+  return buf;
+}
 
 #endif
