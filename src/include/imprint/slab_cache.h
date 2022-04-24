@@ -3,6 +3,9 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
+
+struct ImprintAllocator;
 
 typedef struct ImprintSlabCacheEntryDebug {
     const char* file;
@@ -33,7 +36,7 @@ typedef struct ImprintSlabCache {
     const char* debug;
 } ImprintSlabCache;
 
-void imprintSlabCacheInit(ImprintSlabCache* self, ImprintAllocator* allocator, size_t powerOfTwo, size_t capacity,
+void imprintSlabCacheInit(ImprintSlabCache* self, struct ImprintAllocator* allocator, size_t powerOfTwo, size_t capacity,
                           const char* debug);
 
 void* imprintSlabCacheAllocDebug(ImprintSlabCache* self, size_t octetCount, const char* file, size_t line,
