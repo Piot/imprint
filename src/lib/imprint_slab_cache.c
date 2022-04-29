@@ -163,7 +163,7 @@ bool imprintSlabCacheTryToFree(ImprintSlabCache* self, void* ptr)
 
     char buf[32];
     char buf1[32];
-    CLOG_VERBOSE(">>>> slab: release index %zu used:%s (%s %zu/%zu)", foundEntry->debugIndex,
+    CLOG_VERBOSE(">>>> slab: release index %zu free:%s (%s %zu/%zu)", foundEntry->debugIndex,
                  imprintSizeToString(buf1, 32, foundEntry->usedOctetSize),
                  imprintSizeToString(buf, 32, self->structSize), self->allocatedCount, self->capacity)
 #endif
