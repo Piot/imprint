@@ -11,12 +11,17 @@
 
 void imprintPageAllocatorInit(ImprintPageAllocator* self, size_t pageCount)
 {
-    self->pageCount = 64;
+    self->pageCount = pageCount;
+    if (pageCount > 63)
+    {
+      CLOG_ERROR("63 is max");
+    }
     self->allocatedPageCount = 0;
     self->pageSizeInOctets = 2 * 1024 * 1024;
     self->basePointerForPages = tc_malloc(self->pageSizeInOctets * self->pageCount);
-    CLOG_VERBOSE("=== Allocated all page memory %zu (%zu count)", self->pageSizeInOctets, self->pageCount);
-    self->freePages = ULONG_MAX;
+    char buf[32];
+    CLOG_DEBUG("=== Allocated all page memory %zu (%zu count) %s", self->pageSizeInOctets, self->pageCount, imprintSizeToString(buf, 32, self->pageCount * self->pageSizeInOctets));
+    self->freePages = UINT64_MAX;
 }
 
 void imprintPageAllocatorDestroy(ImprintPageAllocator* self)
@@ -42,9 +47,9 @@ void imprintPageAllocatorAlloc(ImprintPageAllocator* self, size_t pageCount, Imp
             result->memory = self->basePointerForPages + i * self->pageSizeInOctets;
             self->allocatedPageCount += pageCount;
             char buf[32];
-            CLOG_DEBUG(">>>> pages %016lX allocated (%zu page count) (%zu, %s, %zu allocated)", requestMask, pageCount,
+            CLOG_DEBUG(">>>> pages %016lX allocated (%zu page count) (%zu, %s, %zu/%zu total allocated, freePages: %016lX)", requestMask, pageCount,
                        self->allocatedPageCount,
-                       imprintSizeToString(buf, 32, self->allocatedPageCount * self->pageSizeInOctets), self->allocatedPageCount)
+                       imprintSizeToString(buf, 32, self->allocatedPageCount * self->pageSizeInOctets), self->allocatedPageCount, self->pageCount, self->freePages)
             return;
         }
 
