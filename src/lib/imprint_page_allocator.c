@@ -26,7 +26,7 @@ void imprintPageAllocatorInit(ImprintPageAllocator* self, size_t pageCount)
 
 void imprintPageAllocatorDestroy(ImprintPageAllocator* self)
 {
-    if (self->freePages != ULONG_MAX) {
+    if (self->freePages != UINT64_MAX) {
         CLOG_ERROR("pages %016lX was not cleared", self->freePages)
     }
     tc_free(self->basePointerForPages);

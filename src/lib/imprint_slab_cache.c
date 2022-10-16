@@ -79,7 +79,7 @@ void* imprintSlabCacheAlloc(ImprintSlabCache* self, size_t size)
 
 void* imprintSlabCacheAllocDebug(ImprintSlabCache* self, size_t size, const char* file, size_t line, const char* debug)
 {
-    CLOG_ASSERT(self->allocatedCount < self->capacity, "Out of memory in self (%zu out of %zu) for size %zu. %s %s:%d",
+    CLOG_ASSERT(self->allocatedCount < self->capacity, "Out of memory in self (%zd out of %zd) for size %zd. %s %s:%d",
                 self->allocatedCount, self->capacity, self->structSize, self->debug, file, line)
     ImprintSlabCacheEntry* e;
     void* m = imprintSlabCacheAllocInternal(self, size, &e);
