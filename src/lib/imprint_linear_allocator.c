@@ -22,7 +22,7 @@ void imprintLinearAllocatorReset(ImprintLinearAllocator* self)
 void* imprintLinearAllocatorAlloc(ImprintLinearAllocator* self, size_t size)
 {
     if (self == 0) {
-        CLOG_ERROR("NULL memory %lu  '%s'", size, self->debug)
+        CLOG_ERROR("NULL memory %zu  '%s'", size, self->debug)
     }
     if (size == 0) {
         return 0;

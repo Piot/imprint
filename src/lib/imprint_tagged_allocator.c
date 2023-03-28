@@ -60,8 +60,8 @@ static void* imprintTaggedAllocatorAlloc(void* self_, size_t size)
 
     ImprintTaggedAllocator* self = (ImprintTaggedAllocator*) self_;
 
-    char buf[32];
-    char buf1[32];
+    CLOG_EXECUTE(char buf[32];)
+    CLOG_EXECUTE(char buf1[32];)
     CLOG_VERBOSE(">>>> allocate %s (%s)", imprintSizeToString(buf1, 32, size),
                  imprintSizeAndPercentageToString(buf, 32, (uintptr_t) (self->linear.next - self->linear.memory),
                                                   self->linear.size));

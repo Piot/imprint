@@ -39,7 +39,7 @@ char* imprintSizeToStringEx(char* buf, size_t bufSize, size_t size, int flags)
     if (remaining < 10) {
         CLOG_ERROR("buffer is too small")
     }
-    tc_snprintf(buf + len, remaining, " (%d)", size);
+    tc_snprintf(buf + len, remaining, " (%zd)", size);
 
     return buf;
 }
