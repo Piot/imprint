@@ -20,7 +20,7 @@ void imprintTaggedPageAllocatorDestroy(ImprintTaggedPageAllocator* self)
     for (size_t i = 0; i < self->entryCapacity; ++i) {
         ImprintTaggedPageEntry* entry = &self->entries[i];
         if (entry->tag) {
-            CLOG_ERROR("tag %I64X with pages %I64X was not cleared", entry->tag, entry->pageIds);
+            CLOG_ERROR("tag %lX with pages %lX was not cleared", entry->tag, entry->pageIds);
             // imprintPageAllocatorFree(self->pageAllocator, entry->pageIds);
             entry->tag = 0;
         }
