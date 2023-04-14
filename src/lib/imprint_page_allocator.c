@@ -36,9 +36,13 @@ void imprintPageAllocatorDestroy(ImprintPageAllocator* self)
 
 void imprintPageAllocatorAlloc(ImprintPageAllocator* self, size_t pageCount, ImprintPageResult* result)
 {
+    CLOG_EXECUTE(char buf[32]);
+
     if (pageCount > 5) {
-        CLOG_SOFT_ERROR("imprintPageAllocatorAlloc: big chunk allocated %zu", pageCount)
+        CLOG_NOTICE("imprintPageAllocatorAlloc: big number of pages allocated: %zu (%s)", pageCount,
+                    imprintSizeToString(buf, 32, pageCount*self->pageSizeInOctets))
     }
+
     uint64_t requestMask = ((1 << pageCount) - 1);
     for (size_t i = 0; i < 64 - pageCount; ++i) {
         uint64_t usedAndRequestMask = self->freePages & requestMask;
@@ -47,7 +51,6 @@ void imprintPageAllocatorAlloc(ImprintPageAllocator* self, size_t pageCount, Imp
             result->pageIds = requestMask;
             result->memory = self->basePointerForPages + i * self->pageSizeInOctets;
             self->allocatedPageCount += pageCount;
-            CLOG_EXECUTE(char buf[32]);
             CLOG_DEBUG(">>>> pages %lX allocated (%zu page count) (%zu, %s, %zu/%zu total allocated, freePages: %lX)", requestMask, pageCount,
                        self->allocatedPageCount,
                        imprintSizeToString(buf, 32, self->allocatedPageCount * self->pageSizeInOctets), self->allocatedPageCount, self->pageCount, self->freePages)
