@@ -5,7 +5,6 @@
 #include <clog/clog.h>
 #include <imprint/allocator.h>
 #include <imprint/slab_cache.h>
-#include <imprint/tagged_allocator.h>
 #include <imprint/utils.h>
 
 void imprintSlabCacheInit(ImprintSlabCache* self, ImprintAllocator* allocator, size_t powerOfTwo, size_t capacity,
@@ -129,7 +128,7 @@ static inline ImprintSlabCacheEntry* entryFromAllocation(const ImprintSlabCache*
 static inline ImprintSlabCacheEntry* findEntryFromAllocation(const ImprintSlabCache* self, const void* p)
 {
     int index = findIndexFromAllocation(self, p);
-    if (index >= self->capacity || index < 0) {
+    if (index >= (int)self->capacity || index < 0) {
         return 0;
     }
 

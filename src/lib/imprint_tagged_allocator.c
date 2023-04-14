@@ -51,6 +51,8 @@ static void* imprintTaggedAllocatorAllocDebug(void* self_, size_t size, const ch
     return memory;
 }
 
+#if !CONFIGURATION_DEBUG
+
 static void* imprintTaggedAllocatorAlloc(void* self_, size_t size)
 {
 
@@ -74,7 +76,10 @@ static void* imprintTaggedAllocatorAlloc(void* self_, size_t size)
 
     return memory;
 }
+#endif
 
+
+#if CONFIGURATION_DEBUG
 static void* imprintTaggedAllocatorCallocDebug(void* self_, size_t size, const char* sourceFile, size_t line,
                                                const char* description)
 {
@@ -88,7 +93,9 @@ static void* imprintTaggedAllocatorCallocDebug(void* self_, size_t size, const c
 
     return memory;
 }
+#endif
 
+#if !CONFIGURATION_DEBUG
 static void* imprintTaggedAllocatorCalloc(void* self_, size_t size)
 {
     if (size == 0) {
@@ -101,6 +108,7 @@ static void* imprintTaggedAllocatorCalloc(void* self_, size_t size)
 
     return memory;
 }
+#endif
 
 void imprintTaggedAllocatorInit(ImprintTaggedAllocator* self, ImprintTaggedPageAllocator* taggedPageAllocator,
                                 uint64_t tag)

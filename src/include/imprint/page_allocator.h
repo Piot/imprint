@@ -17,6 +17,7 @@ typedef struct ImprintPageResult {
 
 typedef struct ImprintPageAllocator {
     uint64_t freePages;
+    uint64_t maxFreePagesMask;
     uint8_t* basePointerForPages;
     size_t pageCount;
     size_t pageSizeInOctets;

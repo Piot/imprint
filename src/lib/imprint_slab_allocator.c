@@ -19,6 +19,7 @@ static inline void* imprintSlabAllocatorAllocDebug(void* self_, size_t size, con
     CLOG_ERROR("unsupported size %zu", size);
 }
 
+#if !CONFIGURATION_DEBUG
 static inline void* imprintSlabAllocatorAlloc(void* self_, size_t size)
 {
     ImprintSlabAllocator* self = (ImprintSlabAllocator*) self_;
@@ -31,6 +32,42 @@ static inline void* imprintSlabAllocatorAlloc(void* self_, size_t size)
 
     CLOG_ERROR("unsupported size %zu", size);
 }
+#endif
+
+#if CONFIGURATION_DEBUG
+
+static void* imprintSlabAllocatorCallocDebug(void* self_, size_t size, const char* sourceFile, size_t line,
+                                               const char* description)
+{
+    if (size == 0) {
+        return 0;
+    }
+    ImprintSlabAllocator* self = (ImprintSlabAllocator*) self_;
+
+    void* memory = imprintSlabAllocatorAllocDebug(self, size, sourceFile, line, description);
+    tc_mem_clear(memory, size);
+
+    return memory;
+}
+#endif
+
+#if !CONFIGURATION_DEBUG
+static void* imprintSlabAllocatorCalloc(void* self_, size_t size)
+{
+    if (size == 0) {
+        return 0;
+    }
+    ImprintSlabAllocator* self = (ImprintSlabAllocator*) self_;
+
+    void* memory = imprintSlabAllocatorAlloc(self, size);
+    tc_mem_clear(memory, size);
+
+    return memory;
+}
+#endif
+
+
+#if CONFIGURATION_DEBUG
 
 static void imprintSlabAllocatorFreeDebug(void* self_, void* ptr, const char* sourceFile, size_t line,
                                           const char* description)
@@ -46,7 +83,9 @@ static void imprintSlabAllocatorFreeDebug(void* self_, void* ptr, const char* so
 
     CLOG_ERROR("illegal free")
 }
+#endif
 
+#if !CONFIGURATION_DEBUG
 static inline void imprintSlabAllocatorFree(void* self_, void* ptr)
 {
     ImprintSlabAllocator* self = (ImprintSlabAllocator*) self_;
@@ -60,12 +99,14 @@ static inline void imprintSlabAllocatorFree(void* self_, void* ptr)
 
     CLOG_ERROR("illegal free")
 }
+#endif
+
 
 void imprintSlabAllocatorAdd(ImprintSlabAllocator* self, ImprintAllocator* allocator, size_t powerOfTwo,
                              size_t arraySize, const char* debug)
 {
     if (self->cacheCount >= self->maxCapacity) {
-        CLOG_ERROR("could not add")
+        CLOG_ERROR("imprintSlabAllocatorAdd: could not add")
     }
     imprintSlabCacheInit(&self->caches[self->cacheCount++], allocator, powerOfTwo, arraySize, debug);
 }
@@ -74,7 +115,7 @@ void imprintSlabAllocatorInit(ImprintSlabAllocator* self, ImprintAllocator* allo
 {
     self->maxCapacity = 4;
     if (cacheCount > self->maxCapacity) {
-        CLOG_ERROR("not supported")
+        CLOG_ERROR("slab allocator: error cache count greater than max capacity. cacheCount:%zu maxCapacity:%zu", cacheCount, self->maxCapacity)
     }
 
     for (size_t i = 0; i < cacheCount; ++i) {
@@ -84,11 +125,11 @@ void imprintSlabAllocatorInit(ImprintSlabAllocator* self, ImprintAllocator* allo
 
 #if CONFIGURATION_DEBUG
     self->info.allocator.allocDebugFn = imprintSlabAllocatorAllocDebug;
-    self->info.allocator.callocDebugFn = 0;
+    self->info.allocator.callocDebugFn = imprintSlabAllocatorCallocDebug;
     self->info.freeDebugFn = imprintSlabAllocatorFreeDebug;
 #else
     self->info.allocator.allocFn = imprintSlabAllocatorAlloc;
-    self->info.allocator.callocFn = 0;
+    self->info.allocator.callocFn = imprintSlabAllocatorCalloc;
     self->info.freeFn = imprintSlabAllocatorFree;
 #endif
 }

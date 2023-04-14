@@ -14,19 +14,20 @@ void imprintPageAllocatorInit(ImprintPageAllocator* self, size_t pageCount)
     self->pageCount = pageCount;
     if (pageCount > 63)
     {
-      CLOG_ERROR("63 is max");
+      CLOG_ERROR("imprintPageAllocatorInit: 63 pages are max");
     }
     self->allocatedPageCount = 0;
     self->pageSizeInOctets = 2 * 1024 * 1024;
     self->basePointerForPages = tc_malloc(self->pageSizeInOctets * self->pageCount);
     CLOG_EXECUTE(char buf[32]);
     CLOG_DEBUG("=== Allocated all page memory %zu (%zu count) %s", self->pageSizeInOctets, self->pageCount, imprintSizeToString(buf, 32, self->pageCount * self->pageSizeInOctets));
-    self->freePages = UINT64_MAX;
+    self->maxFreePagesMask = ((uint64_t )1 << self->pageCount)- 1;
+    self->freePages = self->maxFreePagesMask;
 }
 
 void imprintPageAllocatorDestroy(ImprintPageAllocator* self)
 {
-    if (self->freePages != UINT64_MAX) {
+    if (self->freePages != self->maxFreePagesMask) {
         CLOG_ERROR("pages %016llX was not cleared", self->freePages)
     }
     tc_free(self->basePointerForPages);
@@ -36,7 +37,7 @@ void imprintPageAllocatorDestroy(ImprintPageAllocator* self)
 void imprintPageAllocatorAlloc(ImprintPageAllocator* self, size_t pageCount, ImprintPageResult* result)
 {
     if (pageCount > 5) {
-        CLOG_SOFT_ERROR("Big chunk allocated %zu", pageCount)
+        CLOG_SOFT_ERROR("imprintPageAllocatorAlloc: big chunk allocated %zu", pageCount)
     }
     uint64_t requestMask = ((1 << pageCount) - 1);
     for (size_t i = 0; i < 64 - pageCount; ++i) {

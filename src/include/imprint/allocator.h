@@ -38,7 +38,7 @@ typedef struct ImprintAllocatorWithFree {
 #if CONFIGURATION_DEBUG
 #define IMPRINT_ALLOC(allocatorInfo, size, description)                                                                \
     (allocatorInfo)->allocDebugFn(allocatorInfo, size, __FILE__, __LINE__, description)
-#define IMPRINT_CALLOC(allocatorInfo, size, description)                                                               \
+#define IMPRINT_CALLOC(allocatorInfo, size, description) \
     (allocatorInfo)->callocDebugFn(allocatorInfo, size, __FILE__, __LINE__, description)
 #define IMPRINT_FREE(allocatorInfoWithFree, ptr)                                                                       \
     (allocatorInfoWithFree)->freeDebugFn(allocatorInfoWithFree, (void*) (ptr), __FILE__, __LINE__, "")
@@ -58,7 +58,7 @@ typedef struct ImprintAllocatorWithFree {
     (type*) IMPRINT_ALLOC(allocatorInfo, count * sizeof(type), #type)
 
 
-static inline char* imprintStrDup(ImprintAllocator* allocator, const char* str)
+static inline TC_FORCE_INLINE char* imprintStrDup(ImprintAllocator* allocator, const char* str)
 {
   size_t len = tc_strlen(str);
   char* buf = IMPRINT_ALLOC_TYPE_COUNT(allocator, char, len+1);
