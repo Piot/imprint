@@ -5,9 +5,7 @@
 #include <clog/clog.h>
 #include <imprint/page_allocator.h>
 #include <imprint/utils.h>
-#include <limits.h>
 #include <stdbool.h>
-#include <tiny-libc/tiny_libc.h>
 
 void imprintPageAllocatorInit(ImprintPageAllocator* self, size_t pageCount)
 {

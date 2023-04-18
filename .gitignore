@@ -1,8 +1,10 @@
 deps/
 .vscode/
+.idea/
 deps.*/
 CMakeFiles/
 CMakeCache.txt
 *.cmake
+cmake-*/
 Makefile
 *.a

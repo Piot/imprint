@@ -106,7 +106,8 @@ void imprintSlabAllocatorAdd(ImprintSlabAllocator* self, ImprintAllocator* alloc
                              size_t arraySize, const char* debug)
 {
     if (self->cacheCount >= self->maxCapacity) {
-        CLOG_ERROR("imprintSlabAllocatorAdd: could not add")
+        CLOG_ERROR("imprintSlabAllocatorAdd: could not add another slab %zu of"
+                   " %zu", self->cacheCount, self->maxCapacity)
     }
     imprintSlabCacheInit(&self->caches[self->cacheCount++], allocator, powerOfTwo, arraySize, debug);
 }
