@@ -111,6 +111,7 @@ void imprintSlabAllocatorAdd(ImprintSlabAllocator* self, ImprintAllocator* alloc
     }
     imprintSlabCacheInit(&self->caches[self->cacheCount++], allocator, powerOfTwo, arraySize, debug);
 }
+
 void imprintSlabAllocatorInit(ImprintSlabAllocator* self, ImprintAllocator* allocator, size_t powerOfTwo,
                               size_t cacheCount, size_t arraySize, const char* debug)
 {

@@ -28,6 +28,10 @@ void* imprintLinearAllocatorAlloc(ImprintLinearAllocator* self, size_t size)
         return 0;
     }
 
+    if (size > 64 * 1024) {
+        CLOG_NOTICE("bit allocation: %zu octets", size)
+    }
+
     size_t align = 8;
     if (self->memory == 0) {
         CLOG_ERROR("Null memory!")
