@@ -6,7 +6,7 @@
 #include <imprint/linear_allocator.h>
 #include <imprint/utils.h>
 
-#define IMPRINT_LINEAR_ALLOCATOR_DETAILED_LOG (0)
+#define IMPRINT_LINEAR_ALLOCATOR_DETAILED_LOG CONFIGURATION_DEBUG
 
 void imprintLinearAllocatorSelfAlloc(ImprintLinearAllocator* self, ImprintAllocator* allocator, size_t size,
                                      const char* debug)
