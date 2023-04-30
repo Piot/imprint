@@ -29,7 +29,7 @@ void* imprintLinearAllocatorAlloc(ImprintLinearAllocator* self, size_t size)
     }
 
     if (size > 64 * 1024) {
-        CLOG_NOTICE("bit allocation: %zu octets", size)
+        CLOG_NOTICE("big allocation: %zu octets", size)
     }
 
     size_t align = 8;
