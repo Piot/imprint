@@ -5,6 +5,7 @@
 #include <clog/clog.h>
 #include <imprint/slab_allocator.h>
 
+#if CONFIGURATION_DEBUG
 static inline void* imprintSlabAllocatorAllocDebug(void* self_, size_t size, const char* sourceFile, size_t line,
                                                    const char* description)
 {
@@ -18,6 +19,7 @@ static inline void* imprintSlabAllocatorAllocDebug(void* self_, size_t size, con
 
     CLOG_ERROR("unsupported size %zu", size);
 }
+#endif
 
 #if !CONFIGURATION_DEBUG
 static inline void* imprintSlabAllocatorAlloc(void* self_, size_t size)

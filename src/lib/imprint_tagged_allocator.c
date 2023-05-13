@@ -24,6 +24,7 @@ static inline void prepareMemory(ImprintTaggedAllocator* self, size_t size)
     imprintLinearAllocatorInit(&self->linear, result.memory, receivedMemorySize, "tagged allocator");
 }
 
+#if CONFIGURATION_DEBUG
 static void* imprintTaggedAllocatorAllocDebug(void* self_, size_t size, const char* sourceFile, size_t line,
                                               const char* description)
 {
@@ -50,6 +51,7 @@ static void* imprintTaggedAllocatorAllocDebug(void* self_, size_t size, const ch
 
     return memory;
 }
+#endif
 
 #if !CONFIGURATION_DEBUG
 
