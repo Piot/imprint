@@ -118,7 +118,7 @@ static inline int findIndexFromAllocation(const ImprintSlabCache* cache, const v
 static inline ImprintSlabCacheEntry* entryFromAllocation(const ImprintSlabCache* self, const void* p)
 {
     int index = indexFromAllocation(self, p);
-    if (index >= self->capacity || index < 0) {
+    if (index >= (int)self->capacity || index < 0) {
         CLOG_ERROR("illegal free pointer in slab cache")
     }
 

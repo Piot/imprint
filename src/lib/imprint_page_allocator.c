@@ -6,6 +6,7 @@
 #include <imprint/page_allocator.h>
 #include <imprint/utils.h>
 #include <stdbool.h>
+#include <inttypes.h>
 
 void imprintPageAllocatorInit(ImprintPageAllocator* self, size_t pageCount)
 {
@@ -49,7 +50,7 @@ void imprintPageAllocatorAlloc(ImprintPageAllocator* self, size_t pageCount, Imp
             result->pageIds = requestMask;
             result->memory = self->basePointerForPages + i * self->pageSizeInOctets;
             self->allocatedPageCount += pageCount;
-            CLOG_DEBUG(">>>> pages %lX allocated (%zu page count) (%zu, %s, %zu/%zu total allocated, freePages: %lX)", requestMask, pageCount,
+            CLOG_DEBUG(">>>> pages %" PRIX64 " allocated (%zu page count) (%zu, %s, %zu/%zu total allocated, freePages: %" PRIX64, requestMask, pageCount,
                        self->allocatedPageCount,
                        imprintSizeToString(buf, 32, self->allocatedPageCount * self->pageSizeInOctets), self->allocatedPageCount, self->pageCount, self->freePages)
             return;
@@ -58,7 +59,7 @@ void imprintPageAllocatorAlloc(ImprintPageAllocator* self, size_t pageCount, Imp
         requestMask <<= 1;
     }
 
-    CLOG_ERROR("page allocator: out of memory pageCount %zu freeMask %lX", pageCount, self->freePages);
+    CLOG_ERROR("page allocator: out of memory pageCount %zu freeMask %" PRIX64, pageCount, self->freePages);
 }
 
 void imprintPageAllocatorFree(ImprintPageAllocator* self, ImprintPageIdList pageIds)
@@ -97,7 +98,7 @@ void imprintPageAllocatorFreeSeparate(ImprintPageAllocator* self, ImprintPageIdL
     self->freePages |= pageIds;
 
     CLOG_EXECUTE(char buf[32]);
-    CLOG_DEBUG(">>>> pages %lX free (%zu, %s allocated)", pageIds, self->allocatedPageCount,
+    CLOG_DEBUG(">>>> pages %" PRIX64  " free (%zu, %s allocated)", pageIds, self->allocatedPageCount,
                imprintSizeToString(buf, 32, self->allocatedPageCount * self->pageSizeInOctets))
     uint64_t mask = 1;
     for (size_t i = 0; i < 64; ++i) {
@@ -110,7 +111,7 @@ void imprintPageAllocatorFreeSeparate(ImprintPageAllocator* self, ImprintPageIdL
         mask <<= 1;
     }
 
-    CLOG_DEBUG(">>>> pages %IlX after free (%zu allocated)", pageIds,
+    CLOG_DEBUG(">>>> pages %" PRIX64 " after free (%zu allocated)", pageIds,
                        self->allocatedPageCount)
 
 #if CONFIGURATION_DEBUG
