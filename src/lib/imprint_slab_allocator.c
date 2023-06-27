@@ -17,7 +17,7 @@ static inline void* imprintSlabAllocatorAllocDebug(void* self_, size_t size, con
         }
     }
 
-    CLOG_ERROR("unsupported size %zu", size);
+    CLOG_ERROR("unsupported size %zu", size)
 }
 #endif
 
@@ -32,7 +32,7 @@ static inline void* imprintSlabAllocatorAlloc(void* self_, size_t size)
         }
     }
 
-    CLOG_ERROR("unsupported size %zu", size);
+    CLOG_ERROR("unsupported size %zu", size)
 }
 #endif
 
