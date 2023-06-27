@@ -13,7 +13,7 @@ void imprintPageAllocatorInit(ImprintPageAllocator* self, size_t pageCount)
     self->pageCount = pageCount;
     if (pageCount > 63)
     {
-      CLOG_ERROR("imprintPageAllocatorInit: 63 pages are max");
+      CLOG_ERROR("imprintPageAllocatorInit: 63 pages are max")
     }
     self->allocatedPageCount = 0;
     self->pageSizeInOctets = 2 * 1024 * 1024;
@@ -27,7 +27,7 @@ void imprintPageAllocatorInit(ImprintPageAllocator* self, size_t pageCount)
 void imprintPageAllocatorDestroy(ImprintPageAllocator* self)
 {
     if (self->freePages != self->maxFreePagesMask) {
-        CLOG_ERROR("pages %016llX was not cleared", self->freePages)
+        CLOG_ERROR("pages %" PRIx64 " was not cleared", self->freePages)
     }
     tc_free(self->basePointerForPages);
     self->basePointerForPages = 0;
