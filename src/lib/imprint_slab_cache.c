@@ -123,7 +123,7 @@ static inline ImprintSlabCacheEntry* findEntryFromAllocation(const ImprintSlabCa
 static inline void freeEntry(ImprintSlabCache* self, ImprintSlabCacheEntry* e)
 {
     if (!e->isAllocated) {
-        CLOG_ERROR("can not free this");
+        CLOG_ERROR("can not free this")
     }
     e->isAllocated = false;
     self->allocatedCount--;

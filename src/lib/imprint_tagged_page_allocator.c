@@ -21,7 +21,7 @@ void imprintTaggedPageAllocatorDestroy(ImprintTaggedPageAllocator* self)
     for (size_t i = 0; i < self->entryCapacity; ++i) {
         ImprintTaggedPageEntry* entry = &self->entries[i];
         if (entry->tag) {
-            CLOG_ERROR("tag %" PRIX64 " with pages %" PRIX64 " was not cleared", entry->tag, entry->pageIds);
+            CLOG_ERROR("tag %" PRIX64 " with pages %" PRIX64 " was not cleared", entry->tag, entry->pageIds)
         }
     }
 }
@@ -31,7 +31,7 @@ void imprintTaggedPageAllocatorAlloc(ImprintTaggedPageAllocator* self, uint64_t 
 {
     ImprintTaggedPageEntry* foundEntry = 0;
     if (!tag) {
-        CLOG_ERROR("tag can not be zero");
+        CLOG_ERROR("tag can not be zero")
     }
 
     for (size_t i = 0; i < self->entryCapacity; ++i) {
@@ -55,7 +55,7 @@ void imprintTaggedPageAllocatorAlloc(ImprintTaggedPageAllocator* self, uint64_t 
     }
 
     if (!foundEntry) {
-        CLOG_ERROR("out of memory");
+        CLOG_ERROR("out of memory")
     }
 
     imprintPageAllocatorAlloc(self->pageAllocator, pageCount, result);
@@ -74,5 +74,5 @@ void imprintTaggedPageAllocatorFree(ImprintTaggedPageAllocator* self, uint64_t t
         }
     }
 
-    CLOG_ERROR("unknown tag %" PRIX64 , tag);
+    CLOG_ERROR("unknown tag %" PRIX64 , tag)
 }
