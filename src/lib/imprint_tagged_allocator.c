@@ -42,7 +42,7 @@ static void* imprintTaggedAllocatorAllocDebug(void* self_, size_t size, const ch
     char buf1[32];
     CLOG_VERBOSE(">>>> tag allocate %016X %s (%s)", self->tag, imprintSizeToString(buf1, 32, size),
                  imprintSizeAndPercentageToString(buf, 32, (uintptr_t) (self->linear.next - self->linear.memory),
-                                                  self->linear.size));
+                                                  self->linear.size))
 #endif
 
     prepareMemory(self, size);
@@ -70,7 +70,7 @@ static void* imprintTaggedAllocatorAlloc(void* self_, size_t size)
     CLOG_EXECUTE(char buf1[32];)
     CLOG_VERBOSE(">>>> allocate %s (%s)", imprintSizeToString(buf1, 32, size),
                  imprintSizeAndPercentageToString(buf, 32, (uintptr_t) (self->linear.next - self->linear.memory),
-                                                  self->linear.size));
+                                                  self->linear.size))
 
     prepareMemory(self, size);
 
