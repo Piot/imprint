@@ -35,7 +35,7 @@ typedef struct ImprintAllocatorWithFree {
     ImprintFreeFn freeFn;
 } ImprintAllocatorWithFree;
 
-#if CONFIGURATION_DEBUG
+#if defined CONFIGURATION_DEBUG
 #define IMPRINT_ALLOC(allocatorInfo, size, description)                                                                \
     (allocatorInfo)->allocDebugFn(allocatorInfo, size, __FILE__, __LINE__, description)
 #define IMPRINT_CALLOC(allocatorInfo, size, description) \

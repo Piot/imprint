@@ -5,7 +5,7 @@
 #include <clog/clog.h>
 #include <imprint/slab_allocator.h>
 
-#if CONFIGURATION_DEBUG
+#if defined CONFIGURATION_DEBUG
 static inline void* imprintSlabAllocatorAllocDebug(void* self_, size_t size, const char* sourceFile, size_t line,
                                                    const char* description)
 {
@@ -17,11 +17,11 @@ static inline void* imprintSlabAllocatorAllocDebug(void* self_, size_t size, con
         }
     }
 
-    CLOG_ERROR("unsupported size %zu", size);
+    CLOG_ERROR("unsupported size %zu", size)
 }
 #endif
 
-#if !CONFIGURATION_DEBUG
+#if !defined CONFIGURATION_DEBUG
 static inline void* imprintSlabAllocatorAlloc(void* self_, size_t size)
 {
     ImprintSlabAllocator* self = (ImprintSlabAllocator*) self_;
@@ -32,11 +32,11 @@ static inline void* imprintSlabAllocatorAlloc(void* self_, size_t size)
         }
     }
 
-    CLOG_ERROR("unsupported size %zu", size);
+    CLOG_ERROR("unsupported size %zu", size)
 }
 #endif
 
-#if CONFIGURATION_DEBUG
+#if defined CONFIGURATION_DEBUG
 
 static void* imprintSlabAllocatorCallocDebug(void* self_, size_t size, const char* sourceFile, size_t line,
                                                const char* description)
@@ -53,7 +53,7 @@ static void* imprintSlabAllocatorCallocDebug(void* self_, size_t size, const cha
 }
 #endif
 
-#if !CONFIGURATION_DEBUG
+#if !defined CONFIGURATION_DEBUG
 static void* imprintSlabAllocatorCalloc(void* self_, size_t size)
 {
     if (size == 0) {
@@ -69,11 +69,15 @@ static void* imprintSlabAllocatorCalloc(void* self_, size_t size)
 #endif
 
 
-#if CONFIGURATION_DEBUG
+#if defined CONFIGURATION_DEBUG
 
 static void imprintSlabAllocatorFreeDebug(void* self_, void* ptr, const char* sourceFile, size_t line,
                                           const char* description)
 {
+    (void) sourceFile;
+    (void) line;
+    (void) description;
+
     ImprintSlabAllocator* self = (ImprintSlabAllocator*) self_;
     for (size_t i = 0; i < self->cacheCount; ++i) {
         ImprintSlabCache* cache = &self->caches[i];
@@ -87,7 +91,7 @@ static void imprintSlabAllocatorFreeDebug(void* self_, void* ptr, const char* so
 }
 #endif
 
-#if !CONFIGURATION_DEBUG
+#if !defined CONFIGURATION_DEBUG
 static inline void imprintSlabAllocatorFree(void* self_, void* ptr)
 {
     ImprintSlabAllocator* self = (ImprintSlabAllocator*) self_;
@@ -127,7 +131,7 @@ void imprintSlabAllocatorInit(ImprintSlabAllocator* self, ImprintAllocator* allo
     }
     self->cacheCount = cacheCount;
 
-#if CONFIGURATION_DEBUG
+#if defined CONFIGURATION_DEBUG
     self->info.allocator.allocDebugFn = imprintSlabAllocatorAllocDebug;
     self->info.allocator.callocDebugFn = imprintSlabAllocatorCallocDebug;
     self->info.freeDebugFn = imprintSlabAllocatorFreeDebug;

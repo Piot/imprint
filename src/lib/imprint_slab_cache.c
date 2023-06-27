@@ -29,7 +29,7 @@ void imprintSlabCacheInit(ImprintSlabCache* self, ImprintAllocator* allocator, s
     for (size_t i = 0; i < self->capacity; ++i) {
         ImprintSlabCacheEntry* e = &self->entries[i];
         e->isAllocated = false;
-        e->line = -1;
+        e->line = (size_t) -1;
         e->file = 0;
         e->nextFreeEntry = 0;
         e->debugIndex = i;
@@ -52,7 +52,7 @@ static inline void* imprintSlabCacheAllocInternal(ImprintSlabCache* self, size_t
     CLOG_ASSERT(e, "first free is null")
     CLOG_ASSERT(!e->isAllocated, "entry already allocated")
 
-    size_t foundIndex = (e - self->entries);
+    size_t foundIndex = (size_t)(e - self->entries);
 
     if (e->debugIndex != foundIndex) {
         CLOG_ERROR("internal error looking up foundIndex")
@@ -86,7 +86,7 @@ void* imprintSlabCacheAllocDebug(ImprintSlabCache* self, size_t size, const char
     e->file = file;
     e->description = debug;
 
-#if CLOG_LOG_ENABLED
+#if defined CLOG_LOG_ENABLED
     char buf[32];
     char buf1[32];
     CLOG_VERBOSE(">>>> slab: allocate index %zu %s (%s %zu/%zu)", e->debugIndex,
@@ -96,15 +96,6 @@ void* imprintSlabCacheAllocDebug(ImprintSlabCache* self, size_t size, const char
     return m;
 }
 
-static inline int indexFromAllocation(const ImprintSlabCache* cache, const void* p)
-{
-
-    if ((uintptr_t) p % cache->structAlign != 0) {
-        CLOG_ERROR("illegal pointer")
-    }
-    return ((const uint8_t*) p - cache->memory) / cache->structSize;
-}
-
 static inline int findIndexFromAllocation(const ImprintSlabCache* cache, const void* p)
 {
 
@@ -112,17 +103,7 @@ static inline int findIndexFromAllocation(const ImprintSlabCache* cache, const v
         return -1;
     }
 
-    return ((uintptr_t) p - (uintptr_t) cache->memory) / cache->structSize;
-}
-
-static inline ImprintSlabCacheEntry* entryFromAllocation(const ImprintSlabCache* self, const void* p)
-{
-    int index = indexFromAllocation(self, p);
-    if (index >= (int)self->capacity || index < 0) {
-        CLOG_ERROR("illegal free pointer in slab cache")
-    }
-
-    return &self->entries[index];
+    return (int)(((uintptr_t) p - (uintptr_t) cache->memory) / cache->structSize);
 }
 
 static inline ImprintSlabCacheEntry* findEntryFromAllocation(const ImprintSlabCache* self, const void* p)
@@ -142,7 +123,7 @@ static inline ImprintSlabCacheEntry* findEntryFromAllocation(const ImprintSlabCa
 static inline void freeEntry(ImprintSlabCache* self, ImprintSlabCacheEntry* e)
 {
     if (!e->isAllocated) {
-        CLOG_ERROR("can not free this");
+        CLOG_ERROR("can not free this")
     }
     e->isAllocated = false;
     self->allocatedCount--;
@@ -162,7 +143,7 @@ bool imprintSlabCacheTryToFree(ImprintSlabCache* self, void* ptr)
         CLOG_ERROR("multiple free")
         return false;
     }
-#if CLOG_LOG_ENABLED
+#if defined CLOG_LOG_ENABLED
 
     char buf[32];
     char buf1[32];

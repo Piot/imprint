@@ -7,8 +7,11 @@
 #include <imprint/tagged_page_allocator.h>
 #include <imprint/utils.h>
 #include <tiny-libc/tiny_libc.h>
+#include <inttypes.h>
 
-#define IMPRINT_TAGGED_ALLOCATOR_DETAILED_LOG (0)
+#if defined CONFIGURATION_DEBUG
+    #define IMPRINT_TAGGED_ALLOCATOR_DETAILED_LOG (0)
+#endif
 
 static inline void prepareMemory(ImprintTaggedAllocator* self, size_t size)
 {
@@ -24,7 +27,7 @@ static inline void prepareMemory(ImprintTaggedAllocator* self, size_t size)
     imprintLinearAllocatorInit(&self->linear, result.memory, receivedMemorySize, "tagged allocator");
 }
 
-#if CONFIGURATION_DEBUG
+#if defined CONFIGURATION_DEBUG
 static void* imprintTaggedAllocatorAllocDebug(void* self_, size_t size, const char* sourceFile, size_t line,
                                               const char* description)
 {
@@ -35,12 +38,12 @@ static void* imprintTaggedAllocatorAllocDebug(void* self_, size_t size, const ch
 
     ImprintTaggedAllocator* self = (ImprintTaggedAllocator*) self_;
 
-#if IMPRINT_TAGGED_ALLOCATOR_DETAILED_LOG
+#if defined IMPRINT_TAGGED_ALLOCATOR_DETAILED_LOG
     char buf[32];
     char buf1[32];
-    CLOG_VERBOSE(">>>> tag allocate %016X %s (%s)", self->tag, imprintSizeToString(buf1, 32, size),
+    CLOG_VERBOSE(">>>> tag allocate %" PRIx64 " %s (%s)", self->tag, imprintSizeToString(buf1, 32, size),
                  imprintSizeAndPercentageToString(buf, 32, (uintptr_t) (self->linear.next - self->linear.memory),
-                                                  self->linear.size));
+                                                  self->linear.size))
 #endif
 
     prepareMemory(self, size);
@@ -53,7 +56,7 @@ static void* imprintTaggedAllocatorAllocDebug(void* self_, size_t size, const ch
 }
 #endif
 
-#if !CONFIGURATION_DEBUG
+#if !defined CONFIGURATION_DEBUG
 
 static void* imprintTaggedAllocatorAlloc(void* self_, size_t size)
 {
@@ -68,7 +71,7 @@ static void* imprintTaggedAllocatorAlloc(void* self_, size_t size)
     CLOG_EXECUTE(char buf1[32];)
     CLOG_VERBOSE(">>>> allocate %s (%s)", imprintSizeToString(buf1, 32, size),
                  imprintSizeAndPercentageToString(buf, 32, (uintptr_t) (self->linear.next - self->linear.memory),
-                                                  self->linear.size));
+                                                  self->linear.size))
 
     prepareMemory(self, size);
 
@@ -81,7 +84,7 @@ static void* imprintTaggedAllocatorAlloc(void* self_, size_t size)
 #endif
 
 
-#if CONFIGURATION_DEBUG
+#if defined CONFIGURATION_DEBUG
 static void* imprintTaggedAllocatorCallocDebug(void* self_, size_t size, const char* sourceFile, size_t line,
                                                const char* description)
 {
@@ -97,7 +100,7 @@ static void* imprintTaggedAllocatorCallocDebug(void* self_, size_t size, const c
 }
 #endif
 
-#if !CONFIGURATION_DEBUG
+#if !defined CONFIGURATION_DEBUG
 static void* imprintTaggedAllocatorCalloc(void* self_, size_t size)
 {
     if (size == 0) {
@@ -121,7 +124,7 @@ void imprintTaggedAllocatorInit(ImprintTaggedAllocator* self, ImprintTaggedPageA
     self->linear.next = 0;
     self->linear.size = 0;
     self->cachedPageSize = taggedPageAllocator->pageAllocator->pageSizeInOctets;
-#if CONFIGURATION_DEBUG
+#if defined CONFIGURATION_DEBUG
     self->info.allocDebugFn = imprintTaggedAllocatorAllocDebug;
     self->info.callocDebugFn = imprintTaggedAllocatorCallocDebug;
 #else
