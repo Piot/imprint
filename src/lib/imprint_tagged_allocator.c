@@ -7,6 +7,7 @@
 #include <imprint/tagged_page_allocator.h>
 #include <imprint/utils.h>
 #include <tiny-libc/tiny_libc.h>
+#include <inttypes.h>
 
 #if defined CONFIGURATION_DEBUG
     #define IMPRINT_TAGGED_ALLOCATOR_DETAILED_LOG (0)
@@ -40,7 +41,7 @@ static void* imprintTaggedAllocatorAllocDebug(void* self_, size_t size, const ch
 #if defined IMPRINT_TAGGED_ALLOCATOR_DETAILED_LOG
     char buf[32];
     char buf1[32];
-    CLOG_VERBOSE(">>>> tag allocate %016X %s (%s)", self->tag, imprintSizeToString(buf1, 32, size),
+    CLOG_VERBOSE(">>>> tag allocate %" PRIx64 " %s (%s)", self->tag, imprintSizeToString(buf1, 32, size),
                  imprintSizeAndPercentageToString(buf, 32, (uintptr_t) (self->linear.next - self->linear.memory),
                                                   self->linear.size))
 #endif
