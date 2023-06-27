@@ -26,11 +26,11 @@ void imprintLinearAllocatorReset(ImprintLinearAllocator* self);
 
 void* imprintLinearAllocatorAlloc(ImprintLinearAllocator* self, size_t size);
 
-void* imprintLinearAllocatorAllocDebug(ImprintLinearAllocator* self, size_t size, const char* source_file, int line,
+void* imprintLinearAllocatorAllocDebug(ImprintLinearAllocator* self, size_t size, const char* source_file, size_t line,
                                        const char* description);
 
 void* imprintLinearAllocatorCalloc(ImprintLinearAllocator* self, size_t size);
-void* imprintLinearAllocatorCallocDebug(ImprintLinearAllocator* self, size_t size, const char* source_file, int line,
+void* imprintLinearAllocatorCallocDebug(ImprintLinearAllocator* self, size_t size, const char* source_file, size_t line,
                                         const char* description);
 
 #endif

@@ -22,8 +22,6 @@ void imprintTaggedPageAllocatorDestroy(ImprintTaggedPageAllocator* self)
         ImprintTaggedPageEntry* entry = &self->entries[i];
         if (entry->tag) {
             CLOG_ERROR("tag %" PRIX64 " with pages %" PRIX64 " was not cleared", entry->tag, entry->pageIds);
-            // imprintPageAllocatorFree(self->pageAllocator, entry->pageIds);
-            entry->tag = 0;
         }
     }
 }

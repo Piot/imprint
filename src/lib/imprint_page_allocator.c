@@ -66,7 +66,7 @@ void imprintPageAllocatorFree(ImprintPageAllocator* self, ImprintPageIdList page
 {
     self->freePages |= pageIds;
 
-#if CONFIGURATION_DEBUG
+#if defined CONFIGURATION_DEBUG
 
     uint64_t mask = 1;
     size_t start = 0;
@@ -114,7 +114,7 @@ void imprintPageAllocatorFreeSeparate(ImprintPageAllocator* self, ImprintPageIdL
     CLOG_DEBUG(">>>> pages %" PRIX64 " after free (%zu allocated)", pageIds,
                        self->allocatedPageCount)
 
-#if CONFIGURATION_DEBUG
+#if defined CONFIGURATION_DEBUG
     uint64_t xmask = 1;
     for (size_t i = 0; i < 64; ++i) {
         if (pageIds & xmask) {
