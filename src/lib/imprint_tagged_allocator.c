@@ -9,8 +9,8 @@
 #include <tiny-libc/tiny_libc.h>
 #include <inttypes.h>
 
-#if defined CONFIGURATION_DEBUG
-    #define IMPRINT_TAGGED_ALLOCATOR_DETAILED_LOG (0)
+#if defined CONFIGURATION_DEBUG && defined CLOG_LOG_ENABLED
+    // #define IMPRINT_TAGGED_ALLOCATOR_DETAILED_LOG (1)
 #endif
 
 static inline void prepareMemory(ImprintTaggedAllocator* self, size_t size)
