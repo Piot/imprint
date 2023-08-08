@@ -4,7 +4,9 @@ deps/
 deps.*/
 CMakeFiles/
 CMakeCache.txt
-*.cmake
+cmake_install.cmake
 cmake-*/
 Makefile
 *.a
+.cmake/
+build/
