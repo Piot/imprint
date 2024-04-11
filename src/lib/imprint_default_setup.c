@@ -29,7 +29,7 @@ int imprintDefaultSetupInit(ImprintDefaultSetup *self, size_t memory)
 
     imprintSlabAllocatorInit(&self->slabAllocator, slabTagAllocator, 7, 3,
                              256, "blobSlabAllocator");
-    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 16, 24,
+    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 20, 24,
                             "extra big size");
 
     return 0;
