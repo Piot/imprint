@@ -10,3 +10,5 @@ Makefile
 *.a
 .cmake/
 build/
+src/lib/CTestTestfile.cmake
+.DS_Store

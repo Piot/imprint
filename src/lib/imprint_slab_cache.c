@@ -1,7 +1,7 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Peter Bjorklund. All rights reserved.
+/*----------------------------------------------------------------------------------------------------------
+ *  Copyright (c) Peter Bjorklund. All rights reserved. https://github.com/piot/imprint
  *  Licensed under the MIT License. See LICENSE in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+ *--------------------------------------------------------------------------------------------------------*/
 #include <clog/clog.h>
 #include <imprint/allocator.h>
 #include <imprint/slab_cache.h>
@@ -78,7 +78,7 @@ void* imprintSlabCacheAlloc(ImprintSlabCache* self, size_t size)
 
 void* imprintSlabCacheAllocDebug(ImprintSlabCache* self, size_t size, const char* file, size_t line, const char* debug)
 {
-    CLOG_ASSERT(self->allocatedCount < self->capacity, "Out of memory in self (%zd out of %zd) for size %zd. %s %s:%zd",
+    CLOG_ASSERT(self->allocatedCount < self->capacity, "Out of memory in self (%zu out of %zu) for size %zu. %s %s:%zu",
                 self->allocatedCount, self->capacity, self->structSize, self->debug, file, line)
     ImprintSlabCacheEntry* e;
     void* m = imprintSlabCacheAllocInternal(self, size, &e);
