@@ -13,6 +13,9 @@ static inline void* imprintSlabAllocatorAllocDebug(void* self_, size_t size, con
     for (size_t i = 0; i < self->cacheCount; ++i) {
         ImprintSlabCache* cache = &self->caches[i];
         if (size <= cache->structSize) {
+            if (cache->allocatedCount >= cache->capacity) {
+                CLOG_NOTICE("slab: out of memory for slab cache %zu (allocation: %zu). continue searching", cache->structSize, size)
+            }
             return imprintSlabCacheAllocDebug(cache, size, sourceFile, line, description);
         }
     }
@@ -118,18 +121,10 @@ void imprintSlabAllocatorAdd(ImprintSlabAllocator* self, ImprintAllocator* alloc
     imprintSlabCacheInit(&self->caches[self->cacheCount++], allocator, powerOfTwo, arraySize, debug);
 }
 
-void imprintSlabAllocatorInit(ImprintSlabAllocator* self, ImprintAllocator* allocator, size_t powerOfTwo,
-                              size_t cacheCount, size_t arraySize, const char* debug)
+void imprintSlabAllocatorInit(ImprintSlabAllocator* self)
 {
-    self->maxCapacity = 4;
-    if (cacheCount > self->maxCapacity) {
-        CLOG_ERROR("slab allocator: error cache count greater than max capacity. cacheCount:%zu maxCapacity:%zu", cacheCount, self->maxCapacity)
-    }
+    self->maxCapacity = IMPRINT_SLAB_CACHE_MAX_COUNT;
 
-    for (size_t i = 0; i < cacheCount; ++i) {
-        imprintSlabCacheInit(&self->caches[i], allocator, powerOfTwo + i, arraySize, debug);
-    }
-    self->cacheCount = cacheCount;
 
 #if defined CONFIGURATION_DEBUG
     self->info.allocator.allocDebugFn = imprintSlabAllocatorAllocDebug;

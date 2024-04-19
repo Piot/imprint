@@ -8,7 +8,7 @@
 /// @param self the setup to initialize
 /// @param memory the number of octets to allocate
 /// @return negative number on error
-int imprintDefaultSetupInit(ImprintDefaultSetup *self, size_t memory)
+int imprintDefaultSetupInit(ImprintDefaultSetup* self, size_t memory)
 {
     const size_t pageSize = 2 * 1024 * 1024;
 
@@ -27,18 +27,23 @@ int imprintDefaultSetupInit(ImprintDefaultSetup *self, size_t memory)
 
     ImprintAllocator* slabTagAllocator = &self->tagAllocator.info;
 
-    imprintSlabAllocatorInit(&self->slabAllocator, slabTagAllocator, 7, 3,
-                             256, "blobSlabAllocator");
-    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 20, 24,
-                            "extra big size");
+    imprintSlabAllocatorInit(&self->slabAllocator);
+
+    // Add must be called in order of size!
+    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 5, 256, "slab: 32");
+    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 7, 256, "slab: 128");
+    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 8, 256, "slab: 256");
+    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 9, 256, "slab: 512");
+    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 10, 128, "slab: 1024");
+    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 11, 128, "slab: 2048");
+    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 20, 24, "slab: extra big size");
 
     return 0;
 }
 
-
 /// Free up memory allocated by imprintDefaultSetupInit().
 /// @param self the setup to destroy
-void imprintDefaultSetupDestroy(ImprintDefaultSetup *self)
+void imprintDefaultSetupDestroy(ImprintDefaultSetup* self)
 {
     imprintTaggedAllocatorFreeAll(&self->tagAllocator);
 

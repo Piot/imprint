@@ -7,8 +7,8 @@
 #include <imprint/slab_cache.h>
 #include <imprint/utils.h>
 
-void imprintSlabCacheInit(ImprintSlabCache* self, ImprintAllocator* allocator, size_t powerOfTwo, size_t capacity,
-                          const char* debug)
+void imprintSlabCacheInit(ImprintSlabCache* self, ImprintAllocator* allocator, size_t powerOfTwo,
+    size_t capacity, const char* debug)
 {
     size_t octetCount = 1 << powerOfTwo;
     self->structSize = octetCount;
@@ -21,6 +21,12 @@ void imprintSlabCacheInit(ImprintSlabCache* self, ImprintAllocator* allocator, s
         self->structAlign = self->structSize;
     }
 
+    char itemSizeBuf[32];
+    char totalSizeBuf[32];
+    CLOG_DEBUG("Allocating slab cache of powerOfTwo:%zu, itemSize:%s, capacity:%zu (total:%s)",
+        powerOfTwo, imprintSizeToString(itemSizeBuf, 32, self->structSize), self->capacity,
+        imprintSizeToString(totalSizeBuf, 32, self->totalSize))
+
     self->memory = IMPRINT_ALLOC(allocator, self->totalSize, debug);
     self->entries = IMPRINT_CALLOC_TYPE_COUNT(allocator, ImprintSlabCacheEntry, self->capacity);
 
@@ -29,7 +35,7 @@ void imprintSlabCacheInit(ImprintSlabCache* self, ImprintAllocator* allocator, s
     for (size_t i = 0; i < self->capacity; ++i) {
         ImprintSlabCacheEntry* e = &self->entries[i];
         e->isAllocated = false;
-        e->line = (size_t) -1;
+        e->line = (size_t)-1;
         e->file = 0;
         e->nextFreeEntry = 0;
         e->debugIndex = i;
@@ -39,10 +45,12 @@ void imprintSlabCacheInit(ImprintSlabCache* self, ImprintAllocator* allocator, s
     }
 }
 
-static inline void* imprintSlabCacheAllocInternal(ImprintSlabCache* self, size_t size, ImprintSlabCacheEntry** outEntry)
+static inline void* imprintSlabCacheAllocInternal(
+    ImprintSlabCache* self, size_t size, ImprintSlabCacheEntry** outEntry)
 {
-    CLOG_ASSERT(self->allocatedCount < self->capacity, "Out of memory in self (%zu out of %zu) for size %zu. %s",
-                self->allocatedCount, self->capacity, self->structSize, self->debug)
+    CLOG_ASSERT(self->allocatedCount < self->capacity,
+        "Out of memory in self (%zu out of %zu) for size %zu. %s", self->allocatedCount,
+        self->capacity, self->structSize, self->debug)
 
     if (self->firstFreeEntry == 0) {
         CLOG_INFO("First free is not available")
@@ -58,7 +66,7 @@ static inline void* imprintSlabCacheAllocInternal(ImprintSlabCache* self, size_t
         CLOG_ERROR("internal error looking up foundIndex")
     }
 
-    uint8_t* m = (uint8_t*) self->memory + (foundIndex * self->structSize);
+    uint8_t* m = (uint8_t*)self->memory + (foundIndex * self->structSize);
     *outEntry = e;
     self->firstFreeEntry = e->nextFreeEntry;
     self->allocatedCount++;
@@ -76,10 +84,12 @@ void* imprintSlabCacheAlloc(ImprintSlabCache* self, size_t size)
     return m;
 }
 
-void* imprintSlabCacheAllocDebug(ImprintSlabCache* self, size_t size, const char* file, size_t line, const char* debug)
+void* imprintSlabCacheAllocDebug(
+    ImprintSlabCache* self, size_t size, const char* file, size_t line, const char* debug)
 {
-    CLOG_ASSERT(self->allocatedCount < self->capacity, "Out of memory in self (%zu out of %zu) for size %zu. %s %s:%zu",
-                self->allocatedCount, self->capacity, self->structSize, self->debug, file, line)
+    CLOG_ASSERT(self->allocatedCount < self->capacity,
+        "Out of memory in self (%zu out of %zu) for size %zu. %s %s:%zu", self->allocatedCount,
+        self->capacity, self->structSize, self->debug, file, line)
     ImprintSlabCacheEntry* e;
     void* m = imprintSlabCacheAllocInternal(self, size, &e);
     e->line = line;
@@ -89,9 +99,9 @@ void* imprintSlabCacheAllocDebug(ImprintSlabCache* self, size_t size, const char
 #if defined CLOG_LOG_ENABLED
     char buf[32];
     char buf1[32];
-    CLOG_VERBOSE(">>>> slab: allocate index %zu %s (%s %zu/%zu)", e->debugIndex,
-                 imprintSizeToString(buf1, 32, e->usedOctetSize), imprintSizeToString(buf, 32, self->structSize),
-                 self->allocatedCount, self->capacity)
+    CLOG_VERBOSE(">>>> slab: allocate %s, assigned to index:%zu (in cache:%s usage:%zu/%zu)",
+        imprintSizeToString(buf1, 32, e->usedOctetSize), e->debugIndex,
+        imprintSizeToString(buf, 32, self->structSize), self->allocatedCount, self->capacity)
 #endif
     return m;
 }
@@ -99,14 +109,15 @@ void* imprintSlabCacheAllocDebug(ImprintSlabCache* self, size_t size, const char
 static inline int findIndexFromAllocation(const ImprintSlabCache* cache, const void* p)
 {
 
-    if ((uintptr_t) p % cache->structAlign != 0) {
+    if ((uintptr_t)p % cache->structAlign != 0) {
         return -1;
     }
 
-    return (int)(((uintptr_t) p - (uintptr_t) cache->memory) / cache->structSize);
+    return (int)(((uintptr_t)p - (uintptr_t)cache->memory) / cache->structSize);
 }
 
-static inline ImprintSlabCacheEntry* findEntryFromAllocation(const ImprintSlabCache* self, const void* p)
+static inline ImprintSlabCacheEntry* findEntryFromAllocation(
+    const ImprintSlabCache* self, const void* p)
 {
     int index = findIndexFromAllocation(self, p);
     if (index >= (int)self->capacity || index < 0) {
@@ -148,8 +159,8 @@ bool imprintSlabCacheTryToFree(ImprintSlabCache* self, void* ptr)
     char buf[32];
     char buf1[32];
     CLOG_VERBOSE(">>>> slab: release index %zu free:%s (%s %zu/%zu)", foundEntry->debugIndex,
-                 imprintSizeToString(buf1, 32, foundEntry->usedOctetSize),
-                 imprintSizeToString(buf, 32, self->structSize), self->allocatedCount, self->capacity)
+        imprintSizeToString(buf1, 32, foundEntry->usedOctetSize),
+        imprintSizeToString(buf, 32, self->structSize), self->allocatedCount, self->capacity)
 #endif
 
     freeEntry(self, foundEntry);

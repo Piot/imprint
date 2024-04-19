@@ -8,15 +8,16 @@
 #include <imprint/allocator.h>
 #include <imprint/slab_cache.h>
 
+#define IMPRINT_SLAB_CACHE_MAX_COUNT (8)
+
 typedef struct ImprintSlabAllocator {
     ImprintAllocatorWithFree info;
-    ImprintSlabCache caches[4];
+    ImprintSlabCache caches[IMPRINT_SLAB_CACHE_MAX_COUNT];
     size_t cacheCount;
     size_t maxCapacity;
 } ImprintSlabAllocator;
 
-void imprintSlabAllocatorInit(ImprintSlabAllocator* self, ImprintAllocator* allocator, size_t powerOfTwo,
-                              size_t capacity, size_t arraySize, const char* debug);
+void imprintSlabAllocatorInit(ImprintSlabAllocator* self);
 
 void imprintSlabAllocatorAdd(ImprintSlabAllocator* self, ImprintAllocator* allocator, size_t powerOfTwo,
                              size_t arraySize, const char* debug);
