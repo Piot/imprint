@@ -15,13 +15,14 @@ struct ImprintTaggedPageAllocator;
 typedef struct ImprintTaggedAllocator {
     ImprintAllocator info; // MUST BE FIRST
     struct ImprintTaggedPageAllocator* taggedPageAllocator;
+    const char* debug;
     ImprintLinearAllocator linear;
     size_t cachedPageSize;
     uint64_t tag;
 } ImprintTaggedAllocator;
 
-void imprintTaggedAllocatorInit(ImprintTaggedAllocator* self, struct ImprintTaggedPageAllocator* taggedPageAllocator,
-                                uint64_t tag);
+void imprintTaggedAllocatorInit(ImprintTaggedAllocator* self,
+    struct ImprintTaggedPageAllocator* taggedPageAllocator, uint64_t tag, const char* debug);
 
 void imprintTaggedAllocatorFreeAll(ImprintTaggedAllocator* self);
 void imprintTaggedAllocatorClearAll(ImprintTaggedAllocator* self);

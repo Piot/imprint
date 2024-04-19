@@ -22,19 +22,19 @@ void imprintLinearAllocatorReset(ImprintLinearAllocator* self)
 void* imprintLinearAllocatorAlloc(ImprintLinearAllocator* self, size_t size)
 {
     if (self == 0) {
-        CLOG_ERROR("NULL memory %zu  '%s'", size, self->debug)
+        CLOG_ERROR(">>> linear allocate: NULL memory %zu  '%s'", size, self->debug)
     }
     if (size == 0) {
         return 0;
     }
 
     if (size > 64 * 1024) {
-        CLOG_NOTICE("big allocation: %zu octets", size)
+        CLOG_NOTICE(">>> linear allocate: big allocation: %zu octets", size)
     }
 
     size_t align = 8;
     if (self->memory == 0) {
-        CLOG_ERROR("Null memory!")
+        CLOG_ERROR(">>> linear allocate: Null memory!")
     }
 
     size_t rest = (uintptr_t) self->next % align;
@@ -44,16 +44,18 @@ void* imprintLinearAllocatorAlloc(ImprintLinearAllocator* self, size_t size)
 
     size_t allocated = (size_t)(self->next - self->memory);
 
+    if (allocated + size > self->size) {
+        CLOG_ERROR(">>> linear allocate: Error: LinearAllocatorAlloc: Out of memory! %s %zu %zu (%zu/%zu)", self->debug, size, allocated / size, allocated,
+                   self->size)
+    }
+
 #if defined IMPRINT_LINEAR_ALLOCATOR_DETAILED_LOG
     CLOG_EXECUTE(char buf1[64];)
     CLOG_EXECUTE(char buf[64];)
-    CLOG_VERBOSE(">>>> linear allocate %s %s", imprintSizeToString(buf1, 64, size),
-                 imprintSizeAndPercentageToString(buf, 64, allocated, self->size))
+    CLOG_VERBOSE(">>> linear allocate: %s '%s' (%s)", imprintSizeToString(buf1, 64, size), self->debug,
+        imprintSizeAndPercentageToString(buf, 64, allocated, self->size))
 #endif
-    if (allocated + size > self->size) {
-        CLOG_ERROR("Error: LinearAllocatorAlloc: Out of memory! %s %zu %zu (%zu/%zu)", self->debug, size, allocated / size, allocated,
-                   self->size)
-    }
+
     uint8_t* next = self->next;
     self->next += size;
 
@@ -64,14 +66,14 @@ void* imprintLinearAllocatorAllocDebug(ImprintLinearAllocator* self, size_t size
                                        const char* description)
 {
     if (self == 0) {
-        CLOG_ERROR("NULL memory %zu %s:%zu '%s'", size, source_file, line, description)
+        CLOG_ERROR(">>> linear allocate: NULL memory %zu %s:%zu '%s'", size, source_file, line, description)
     }
     if (self->memory == 0) {
-        CLOG_ERROR("Memory is null")
+        CLOG_ERROR(">>> linear allocate: Memory is null")
     }
     void* p = imprintLinearAllocatorAlloc(self, size);
     if (size > 0 && p == 0) {
-        CLOG_ERROR("Out of memory %zu %s:%zu '%s'", size, source_file, line, description)
+        CLOG_ERROR(">>> linear allocate: Out of memory %zu %s:%zu '%s'", size, source_file, line, description)
     }
     return p;
 }
@@ -110,12 +112,12 @@ void* imprintLinearAllocatorCallocDebug(ImprintLinearAllocator* self, size_t siz
                                         const char* description)
 {
     if (self == 0) {
-        CLOG_ERROR("NULL memory %zu %s:%zu '%s'", size, source_file, line, description)
+        CLOG_ERROR(">>> linear allocate: NULL memory %zu %s:%zu '%s'", size, source_file, line, description)
     }
 
     void* p = imprintLinearAllocatorCalloc(self, size);
     if (size > 0 && p == 0) {
-        CLOG_ERROR("Out of memory %zu %s:%zu '%s'", size, source_file, line, description)
+        CLOG_ERROR(">>> linear allocate: Out of memory %zu %s:%zu '%s'", size, source_file, line, description)
     }
     return p;
 }

@@ -15,6 +15,7 @@ typedef struct ImprintDefaultSetup {
     ImprintPageAllocator allPageAllocator;
     ImprintTaggedPageAllocator allTaggedPageAllocator;
     ImprintTaggedAllocator tagAllocator;
+    ImprintTaggedAllocator tagAllocatorForSlabs;
     ImprintSlabAllocator slabAllocator;
 } ImprintDefaultSetup;
 

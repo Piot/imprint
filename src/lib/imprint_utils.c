@@ -33,7 +33,7 @@ char* imprintSizeToString(char* buf, size_t bufSize, size_t size)
 
 char* imprintSizeToStringEx(char* buf, size_t bufSize, size_t size, int flags)
 {
-    (void) flags;
+    (void)flags;
 
     char* result = imprintSizeToString(buf, bufSize, size);
     size_t len = tc_strlen(result);
@@ -69,7 +69,9 @@ char* imprintSizeAndPercentageToString(char* buf, size_t bufSize, size_t size, s
     }
 
     char internalBuf[32];
-    tc_snprintf(buf, bufSize, "%s (%zu %%)", imprintSizeToString(internalBuf, 32, size), percentage);
+    char internalBuf2[32];
+    tc_snprintf(buf, bufSize, "%s/%s [%zu%%]", imprintSizeToString(internalBuf, 32, size),
+        imprintSizeToString(internalBuf2, 32, maxSize), percentage);
 
     return buf;
 }

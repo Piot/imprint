@@ -24,7 +24,7 @@ static inline void prepareMemory(ImprintTaggedAllocator* self, size_t size)
     size_t neededPageCount = (size / self->cachedPageSize) + 1;
     imprintTaggedPageAllocatorAlloc(self->taggedPageAllocator, self->tag, neededPageCount, &result);
     size_t receivedMemorySize = neededPageCount * self->cachedPageSize;
-    imprintLinearAllocatorInit(&self->linear, result.memory, receivedMemorySize, "tagged allocator");
+    imprintLinearAllocatorInit(&self->linear, result.memory, receivedMemorySize, self->debug);
 }
 
 #if defined CONFIGURATION_DEBUG
@@ -116,9 +116,10 @@ static void* imprintTaggedAllocatorCalloc(void* self_, size_t size)
 #endif
 
 void imprintTaggedAllocatorInit(ImprintTaggedAllocator* self, ImprintTaggedPageAllocator* taggedPageAllocator,
-                                uint64_t tag)
+                                uint64_t tag, const char* debug)
 {
     self->taggedPageAllocator = taggedPageAllocator;
+    self->debug = debug;
     self->tag = tag;
     self->linear.memory = 0;
     self->linear.next = 0;

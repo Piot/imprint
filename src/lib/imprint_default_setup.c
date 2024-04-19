@@ -23,10 +23,10 @@ int imprintDefaultSetupInit(ImprintDefaultSetup* self, size_t memory)
 
     imprintTaggedPageAllocatorInit(&self->allTaggedPageAllocator, &self->allPageAllocator);
 
-    imprintTaggedAllocatorInit(&self->tagAllocator, &self->allTaggedPageAllocator, 0xfefe);
+    imprintTaggedAllocatorInit(&self->tagAllocator, &self->allTaggedPageAllocator, 0xfefe, "general tag allocator (0xfefe)");
+    imprintTaggedAllocatorInit(&self->tagAllocatorForSlabs, &self->allTaggedPageAllocator, 0xfeff, "tag allocator for slabs (0xfeff)");
 
-    ImprintAllocator* slabTagAllocator = &self->tagAllocator.info;
-
+    ImprintAllocator* slabTagAllocator = &self->tagAllocatorForSlabs.info;
     imprintSlabAllocatorInit(&self->slabAllocator);
 
     // Add must be called in order of size!
@@ -46,6 +46,7 @@ int imprintDefaultSetupInit(ImprintDefaultSetup* self, size_t memory)
 void imprintDefaultSetupDestroy(ImprintDefaultSetup* self)
 {
     imprintTaggedAllocatorFreeAll(&self->tagAllocator);
+    imprintTaggedAllocatorFreeAll(&self->tagAllocatorForSlabs);
 
     imprintTaggedPageAllocatorDestroy(&self->allTaggedPageAllocator);
     imprintPageAllocatorDestroy(&self->allPageAllocator);
