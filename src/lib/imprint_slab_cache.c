@@ -4,8 +4,18 @@
  *--------------------------------------------------------------------------------------------------------*/
 #include <clog/clog.h>
 #include <imprint/allocator.h>
+#include <imprint/debug.h>
 #include <imprint/slab_cache.h>
 #include <imprint/utils.h>
+
+static const char* relativeFile(const ImprintSlabCacheEntry* entry)
+{
+    static char relativePath[256];
+    imprintDebugFormatFileLink(
+        relativePath, sizeof(relativePath), entry->file, entry->line, entry->description);
+
+    return relativePath;
+}
 
 void imprintSlabCacheInit(ImprintSlabCache* self, ImprintAllocator* allocator, size_t powerOfTwo,
     size_t capacity, const char* debug)
@@ -21,8 +31,8 @@ void imprintSlabCacheInit(ImprintSlabCache* self, ImprintAllocator* allocator, s
         self->structAlign = self->structSize;
     }
 
-    char itemSizeBuf[32];
-    char totalSizeBuf[32];
+    CLOG_EXECUTE(char itemSizeBuf[32];)
+    CLOG_EXECUTE(char totalSizeBuf[32];)
     CLOG_DEBUG("Allocating slab cache of powerOfTwo:%zu, itemSize:%s, capacity:%zu (total:%s)",
         powerOfTwo, imprintSizeToString(itemSizeBuf, 32, self->structSize), self->capacity,
         imprintSizeToString(totalSizeBuf, 32, self->totalSize))
@@ -99,9 +109,10 @@ void* imprintSlabCacheAllocDebug(
 #if defined CLOG_LOG_ENABLED
     char buf[32];
     char buf1[32];
-    CLOG_VERBOSE(">>>> slab: allocate %s, assigned to index:%zu (in cache:%s usage:%zu/%zu)",
+    CLOG_VERBOSE(">>>> slab: allocate %s, assigned to index:%zu (in cache:%s usage:%zu/%zu) %s",
         imprintSizeToString(buf1, 32, e->usedOctetSize), e->debugIndex,
-        imprintSizeToString(buf, 32, self->structSize), self->allocatedCount, self->capacity)
+        imprintSizeToString(buf, 32, self->structSize), self->allocatedCount, self->capacity,
+        relativeFile(e))
 #endif
     return m;
 }
@@ -158,9 +169,10 @@ bool imprintSlabCacheTryToFree(ImprintSlabCache* self, void* ptr)
 
     char buf[32];
     char buf1[32];
-    CLOG_VERBOSE(">>>> slab: release %s, index: %zu (%s %zu/%zu)",
+    CLOG_VERBOSE(">>>> slab: release %s, index: %zu (%s %zu/%zu) %s",
         imprintSizeToString(buf1, 32, foundEntry->usedOctetSize), foundEntry->debugIndex,
-        imprintSizeToString(buf, 32, self->structSize), self->allocatedCount, self->capacity)
+        imprintSizeToString(buf, 32, self->structSize), self->allocatedCount, self->capacity,
+        relativeFile(foundEntry))
 #endif
 
     freeEntry(self, foundEntry);

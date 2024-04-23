@@ -2,6 +2,7 @@
 cmake_minimum_required(VERSION 3.16.3)
 
 add_library(imprint STATIC 
+  debug.c
   imprint_default_setup.c
   imprint_linear_allocator.c
   imprint_page_allocator.c
