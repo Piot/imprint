@@ -124,7 +124,7 @@ void imprintSlabAllocatorAdd(ImprintSlabAllocator* self, ImprintAllocator* alloc
 void imprintSlabAllocatorInit(ImprintSlabAllocator* self)
 {
     self->maxCapacity = IMPRINT_SLAB_CACHE_MAX_COUNT;
-
+    self->cacheCount = 0;
 
 #if defined CONFIGURATION_DEBUG
     self->info.allocator.allocDebugFn = imprintSlabAllocatorAllocDebug;
