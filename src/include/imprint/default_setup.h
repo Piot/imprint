@@ -7,9 +7,9 @@
 
 #include <imprint/linear_allocator.h>
 #include <imprint/page_allocator.h>
-#include <imprint/tagged_page_allocator.h>
-#include <imprint/tagged_allocator.h>
 #include <imprint/slab_allocator.h>
+#include <imprint/tagged_allocator.h>
+#include <imprint/tagged_page_allocator.h>
 
 typedef struct ImprintDefaultSetup {
     ImprintPageAllocator allPageAllocator;
@@ -19,7 +19,8 @@ typedef struct ImprintDefaultSetup {
     ImprintSlabAllocator slabAllocator;
 } ImprintDefaultSetup;
 
-int imprintDefaultSetupInit(ImprintDefaultSetup *self, size_t memorySize);
-void imprintDefaultSetupDestroy(ImprintDefaultSetup *self);
+int imprintDefaultSetupInit(ImprintDefaultSetup* self, size_t memorySize);
+void imprintDefaultSetupDestroy(ImprintDefaultSetup* self);
+void imprintDefaultSetupDebugOutput(const ImprintDefaultSetup* self, const char* description);
 
 #endif

@@ -8,8 +8,9 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
-void imprintPageAllocatorInit(ImprintPageAllocator* self, size_t pageCount)
+void imprintPageAllocatorInit(ImprintPageAllocator* self, size_t pageCount, const char* debug)
 {
+    self->debug = debug;
     self->pageCount = pageCount;
     if (pageCount > 63) {
         CLOG_ERROR(">>> pages: imprintPageAllocatorInit: 63 pages are max")
@@ -22,6 +23,25 @@ void imprintPageAllocatorInit(ImprintPageAllocator* self, size_t pageCount)
         self->pageCount, imprintSizeToString(buf, 32, self->pageCount * self->pageSizeInOctets))
     self->maxFreePagesMask = ((uint64_t)1 << self->pageCount) - 1;
     self->freePages = self->maxFreePagesMask;
+}
+
+void imprintPageAllocatorDebugOutput(const ImprintPageAllocator* self)
+{
+    uint64_t freePages = self->freePages;
+    char buf[65];
+
+    for (size_t i = 0; i < self->pageCount; ++i) {
+        if (freePages & 0x1) {
+            buf[i] = '.';
+        } else {
+            buf[i] = 'X';
+        }
+        freePages >>= 1;
+    }
+    buf[self->pageCount] = '\0';
+
+    CLOG_INFO("page allocator %s: (%zu/%zu): %s", self->debug, self->allocatedPageCount,
+        self->pageCount, buf)
 }
 
 void imprintPageAllocatorDestroy(ImprintPageAllocator* self)
@@ -39,8 +59,8 @@ void imprintPageAllocatorAlloc(
     CLOG_EXECUTE(char buf[32]);
 
     if (pageCount > 5) {
-        CLOG_NOTICE(">>> pages: imprintPageAllocatorAlloc: big number of pages allocated: %zu (%s)", pageCount,
-            imprintSizeToString(buf, 32, pageCount * self->pageSizeInOctets))
+        CLOG_NOTICE(">>> pages: imprintPageAllocatorAlloc: big number of pages allocated: %zu (%s)",
+            pageCount, imprintSizeToString(buf, 32, pageCount * self->pageSizeInOctets))
     }
 
     uint64_t requestMask = ((1 << pageCount) - 1);
@@ -52,7 +72,7 @@ void imprintPageAllocatorAlloc(
             result->memory = self->basePointerForPages + i * self->pageSizeInOctets;
             self->allocatedPageCount += pageCount;
             CLOG_DEBUG(">>>> pages %" PRIX64 " allocated (%zu page count) (%zu, %s, %zu/%zu total "
-                                             "allocated, freePages: %" PRIX64,
+                       "allocated, freePages: %" PRIX64,
                 requestMask, pageCount, self->allocatedPageCount,
                 imprintSizeToString(buf, 32, self->allocatedPageCount * self->pageSizeInOctets),
                 self->allocatedPageCount, self->pageCount, self->freePages)
@@ -62,8 +82,8 @@ void imprintPageAllocatorAlloc(
         requestMask <<= 1;
     }
 
-    CLOG_ERROR(
-        ">>> pages: page allocator: out of memory pageCount %zu freeMask %" PRIX64, pageCount, self->freePages)
+    CLOG_ERROR(">>> pages: page allocator: out of memory pageCount %zu freeMask %" PRIX64,
+        pageCount, self->freePages)
 }
 
 void imprintPageAllocatorFree(ImprintPageAllocator* self, ImprintPageIdList pageIds)

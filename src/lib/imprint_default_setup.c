@@ -2,6 +2,7 @@
  *  Copyright (c) Peter Bjorklund. All rights reserved. https://github.com/piot/imprint
  *  Licensed under the MIT License. See LICENSE in the project root for license information.
  *--------------------------------------------------------------------------------------------------------*/
+#include <clog/clog.h>
 #include <imprint/default_setup.h>
 
 /// Initializes a default setup for memory that would work for most basic applications.
@@ -19,23 +20,25 @@ int imprintDefaultSetupInit(ImprintDefaultSetup* self, size_t memory)
     }
 
     // The page allocator is the only allocator which is using malloc to get memory from the operating system.
-    imprintPageAllocatorInit(&self->allPageAllocator, pageCount);
+    imprintPageAllocatorInit(&self->allPageAllocator, pageCount, "all page memory");
 
     imprintTaggedPageAllocatorInit(&self->allTaggedPageAllocator, &self->allPageAllocator);
 
-    imprintTaggedAllocatorInit(&self->tagAllocator, &self->allTaggedPageAllocator, 0xfefe, "general tag allocator (0xfefe)");
-    imprintTaggedAllocatorInit(&self->tagAllocatorForSlabs, &self->allTaggedPageAllocator, 0xfeff, "tag allocator for slabs (0xfeff)");
+    imprintTaggedAllocatorInit(&self->tagAllocator, &self->allTaggedPageAllocator, 0xfefe,
+        "general tag allocator (0xfefe)");
+    imprintTaggedAllocatorInit(&self->tagAllocatorForSlabs, &self->allTaggedPageAllocator, 0xfeff,
+        "tag allocator for slabs (0xfeff)");
 
     ImprintAllocator* slabTagAllocator = &self->tagAllocatorForSlabs.info;
     imprintSlabAllocatorInit(&self->slabAllocator);
 
     // Add must be called in order of size!
-    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 5, 256, "slab: 32");
-    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 7, 256, "slab: 128");
-    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 8, 256, "slab: 256");
-    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 9, 256, "slab: 512");
-    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 10, 128, "slab: 1024");
-    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 11, 128, "slab: 2048");
+    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 5, 128, "slab: 32");
+    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 7, 96, "slab: 128");
+    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 8, 64, "slab: 256");
+    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 9, 64, "slab: 512");
+    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 10, 64, "slab: 1024");
+    imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 11, 64, "slab: 2048");
     imprintSlabAllocatorAdd(&self->slabAllocator, slabTagAllocator, 20, 24, "slab: extra big size");
 
     return 0;
@@ -50,4 +53,13 @@ void imprintDefaultSetupDestroy(ImprintDefaultSetup* self)
 
     imprintTaggedPageAllocatorDestroy(&self->allTaggedPageAllocator);
     imprintPageAllocatorDestroy(&self->allPageAllocator);
+}
+
+void imprintDefaultSetupDebugOutput(const ImprintDefaultSetup* self, const char* debugOutput)
+{
+    CLOG_INFO("memory stats '%s':", debugOutput)
+    imprintPageAllocatorDebugOutput(&self->allPageAllocator);
+    imprintLinearAllocatorDebugOutput(&self->tagAllocator.linear);
+    imprintLinearAllocatorDebugOutput(&self->tagAllocatorForSlabs.linear);
+    imprintSlabAllocatorDebugOutput(&self->slabAllocator);
 }

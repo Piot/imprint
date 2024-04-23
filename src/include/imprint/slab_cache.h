@@ -40,12 +40,13 @@ typedef struct ImprintSlabCache {
     const char* debug;
 } ImprintSlabCache;
 
-void imprintSlabCacheInit(ImprintSlabCache* self, struct ImprintAllocator* allocator, size_t powerOfTwo, size_t capacity,
-                          const char* debug);
+void imprintSlabCacheInit(ImprintSlabCache* self, struct ImprintAllocator* allocator,
+    size_t powerOfTwo, size_t capacity, const char* debug);
 
-void* imprintSlabCacheAllocDebug(ImprintSlabCache* self, size_t octetCount, const char* file, size_t line,
-                                 const char* debug);
+void* imprintSlabCacheAllocDebug(
+    ImprintSlabCache* self, size_t octetCount, const char* file, size_t line, const char* debug);
 void* imprintSlabCacheAlloc(ImprintSlabCache* self, size_t size);
 bool imprintSlabCacheTryToFree(ImprintSlabCache* self, void* ptr);
+void imprintSlabCacheDebugOutput(const ImprintSlabCache* self);
 
 #endif

@@ -22,4 +22,6 @@ void imprintSlabAllocatorInit(ImprintSlabAllocator* self);
 void imprintSlabAllocatorAdd(ImprintSlabAllocator* self, ImprintAllocator* allocator, size_t powerOfTwo,
                              size_t arraySize, const char* debug);
 
+void imprintSlabAllocatorDebugOutput(const ImprintSlabAllocator* self);
+
 #endif

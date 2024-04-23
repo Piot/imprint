@@ -22,12 +22,15 @@ typedef struct ImprintPageAllocator {
     size_t pageCount;
     size_t pageSizeInOctets;
     size_t allocatedPageCount;
+    const char* debug;
 } ImprintPageAllocator;
 
-void imprintPageAllocatorInit(ImprintPageAllocator* self, size_t pageCount);
+void imprintPageAllocatorInit(ImprintPageAllocator* self, size_t pageCount, const char* debug);
 void imprintPageAllocatorDestroy(ImprintPageAllocator* self);
-void imprintPageAllocatorAlloc(ImprintPageAllocator* self, size_t pageCount, ImprintPageResult* result);
+void imprintPageAllocatorAlloc(
+    ImprintPageAllocator* self, size_t pageCount, ImprintPageResult* result);
 void imprintPageAllocatorFree(ImprintPageAllocator* self, ImprintPageIdList pageId);
 void imprintPageAllocatorFreeSeparate(ImprintPageAllocator* self, ImprintPageIdList pageIds);
+void imprintPageAllocatorDebugOutput(const ImprintPageAllocator* self);
 
 #endif

@@ -55,6 +55,25 @@ void imprintSlabCacheInit(ImprintSlabCache* self, ImprintAllocator* allocator, s
     }
 }
 
+void imprintSlabCacheDebugOutput(const ImprintSlabCache* self)
+{
+    char buf[1024];
+    size_t maxCount = sizeof(buf) - 96;
+    if (self->capacity < maxCount) {
+        maxCount = self->capacity;
+    }
+    for (size_t i = 0; i < maxCount; ++i) {
+        const ImprintSlabCacheEntry* e = &self->entries[i];
+        if (e->isAllocated) {
+            buf[i] = 'X';
+        } else {
+            buf[i] = '.';
+        }
+    }
+    buf[maxCount] = 0;
+    CLOG_INFO(">>> slab: %s (%zu): %s", self->debug, self->capacity, buf)
+}
+
 static inline void* imprintSlabCacheAllocInternal(
     ImprintSlabCache* self, size_t size, ImprintSlabCacheEntry** outEntry)
 {
