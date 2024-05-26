@@ -8,6 +8,7 @@
 #include <imprint/slab_cache.h>
 #include <imprint/utils.h>
 
+#if defined CLOG_LOG_ENABLED
 static const char* relativeFile(const ImprintSlabCacheEntry* entry)
 {
     static char relativePath[256];
@@ -16,6 +17,7 @@ static const char* relativeFile(const ImprintSlabCacheEntry* entry)
 
     return relativePath;
 }
+#endif
 
 void imprintSlabCacheInit(ImprintSlabCache* self, ImprintAllocator* allocator, size_t powerOfTwo,
     size_t capacity, const char* debug)

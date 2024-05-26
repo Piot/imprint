@@ -145,6 +145,7 @@ static void* imprintLinearAllocatorCallocInternal(void* self_, size_t size)
 }
 #endif
 
+       #if defined CLOG_LOG_ENABLED
 void imprintLinearAllocatorDebugOutput(const ImprintLinearAllocator* self)
 {
     static char buf[64];
@@ -163,6 +164,8 @@ void imprintLinearAllocatorDebugOutput(const ImprintLinearAllocator* self)
     CLOG_INFO(">>> linear allocate: debug output '%s' (%s) %s", self->debug,
         imprintSizeAndPercentageToString(buf, sizeof(buf), allocated, self->size), allocate)
 }
+
+#endif
 
 void imprintLinearAllocatorInit(
     ImprintLinearAllocator* self, uint8_t* memory, size_t size, const char* debug)

@@ -57,7 +57,11 @@ void imprintDefaultSetupDestroy(ImprintDefaultSetup* self)
 
 void imprintDefaultSetupDebugOutput(const ImprintDefaultSetup* self, const char* debugOutput)
 {
+    #if defined CLOG_LOG_ENABLED
     CLOG_INFO("memory stats '%s':", debugOutput)
+    #else
+    (void) debugOutput;
+    #endif
     imprintPageAllocatorDebugOutput(&self->allPageAllocator);
     imprintLinearAllocatorDebugOutput(&self->tagAllocator.linear);
     imprintLinearAllocatorDebugOutput(&self->tagAllocatorForSlabs.linear);
